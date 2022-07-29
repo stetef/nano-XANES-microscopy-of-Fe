@@ -236,13 +236,13 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict):
     return translated_colors, color_codemap
 
 
-def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, dimension=4):
+def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, dimension=4, eps=1):
 
     reducer = umap.UMAP(random_state=42, n_components=dimension,
                         n_neighbors=n_neighbors, min_dist=min_dist)
     reduced_space = reducer.fit_transform(pca_components)
 
-    dbscan_clustering = DBSCAN(eps=1., min_samples=1).fit(reduced_space)
+    dbscan_clustering = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
     cluster_dict = {loc: dbscan_clustering.labels_[i] for i, loc in enumerate(list(spectra_dict.keys()))}
     color_labels, codemap = get_translated_colors(dbscan_clustering, spectra_dict)
     colors = [plt.cm.tab20(c) for c in color_labels]
@@ -490,7 +490,8 @@ def plot_conc_from_subset(plot, coeffs, data_columns, subset_indices, color_code
     num_refs = coeffs.shape[0]
     fig, ax = plot
     ax.grid(axis='y', alpha=0.7, linewidth=2, zorder=0)
-    labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+    all_labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+    labels = [e for i, e in enumerate(all_labels) if i < len(coeffs)]
 
     for i in range(num_refs):
         conc_map = {subset_indices[i][num]: coeffs[i, num] for num in range(coeffs.shape[1])}
