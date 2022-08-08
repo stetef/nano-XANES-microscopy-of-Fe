@@ -138,7 +138,7 @@ def normalize_spectrum(energy, spectrum, verbose=False):
     y_norm = y_norm / (spectrum[whiteline + 1])
     
     if verbose:
-        return whiteline, y_fit.reshape(-1), y_norm
+        return whiteline, y_fit.reshape(-1), y_norm, reg
     else:
         return y_norm
 
@@ -154,6 +154,44 @@ def normalize_spectra(energy, spectra_list, spectra_dict):
         normalized_spectra_dict[key] = normalized_spectra[i]
         
     return normalized_spectra, normalized_spectra_dict
+
+
+def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
+                       plot=True):
+    if plot:
+        fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
+        plt.subplots_adjust(wspace=0.2, hspace=0)
+
+    coeffs = []
+    intercepts = []
+    whitelines = []
+    for i, spectrum in enumerate(filtered_spectra[start_i:]):
+        whiteline, y_fit, y_norm, regressor = normalize_spectrum(energy, spectrum, verbose=True)
+        coeffs.append(regressor.coef_[0][0])
+        intercepts.append(regressor.intercept_[0])
+        whitelines.append(whiteline)
+
+        if plot:
+            ax = axes[i, 0]
+            ax.plot(energy, spectrum)
+            ax.plot(energy[whiteline], spectrum[whiteline],
+                    's', c='k', markersize=10, fillstyle='none')
+            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=plt.cm.tab10(1))
+            ax.plot(energy[whiteline:], y_fit, 'k-', linewidth=1)
+
+            ax = axes[i, 1]
+            ax.plot(energy, y_norm)
+
+            for ax in axes[i]:
+                ax.set_xticks([])
+                ax.tick_params(direction='in', width=2, length=6, labelsize=14)
+                ax.grid()
+
+        if i == N - 1:
+            break
+            
+    if return_params:
+        return np.array(coeffs), np.array(intercepts), np.array(whitelines)
 
 
 def make_PCA_traingle_plot(data, n_components):
@@ -214,16 +252,18 @@ def show_PCs(energy, pca, n=4):
     plt.show()
 
 
-def get_translated_colors(dbscan_clustering, filtered_spectra_dict):
+def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True):
     points = list(filtered_spectra_dict.keys())
     point_index = {point: i for i, point in enumerate(points)}
     labels = dbscan_clustering.labels_.copy()
     
     color_codemap = {i: i for i in range(len(np.unique(labels)))}
-    translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
-                       (90, 136): 18, (23, 37): 6, (142, 124): 19,
-                       (98, 58): 7, (101, 115): 12}
-    #translation_map = {}
+    if map_colors:
+        translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
+                           (90, 136): 18, (23, 37): 6, (142, 124): 19,
+                           (98, 58): 7, (101, 115): 12}
+    else:
+        translation_map = {}
     
     for i, point in enumerate(points):
         if point in list(translation_map.keys()):
@@ -275,12 +315,17 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, di
     return color_labels, codemap, dbscan_clustering
 
 
-def plot_color_code_map(spectra_dict, color_labels):
+def plot_color_code_map(spectra_dict, color_labels, show_cluster='all'):
     fig, ax = plt.subplots(figsize=(5, 5))
     for i, key in enumerate(list(spectra_dict.keys())):
         spectrum = spectra_dict[key]
         x, y = key
-        ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+        if show_cluster == 'all':
+            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+        elif show_cluster == color_labels[i]:
+            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+        else:
+            ax.plot(y, -x, color=plt.cm.tab20(15), marker='.', markersize=9, alpha=.3)
     remove_ticks(ax)
     plt.show()
 
@@ -490,7 +535,7 @@ def plot_conc_from_subset(plot, coeffs, data_columns, subset_indices, color_code
     num_refs = coeffs.shape[0]
     fig, ax = plot
     ax.grid(axis='y', alpha=0.7, linewidth=2, zorder=0)
-    all_labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+    all_labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII']
     labels = [e for i, e in enumerate(all_labels) if i < len(coeffs)]
 
     for i in range(num_refs):
