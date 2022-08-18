@@ -4,5 +4,6 @@ Analysis of iron nano-XANES microscopy images of from the 3-ID Hard X-ray Nanopr
 ## The dataset
 
 <p align="center">
-<img src="Figures/preview.mp4" alt="XANES map with spectra interactive plot" width="400">
+	<video width="400" controls>
+  	<source src="Figures/preview.mp4" alt="XANES map with spectra interactive plot" type="video/mp4">
 </p>
