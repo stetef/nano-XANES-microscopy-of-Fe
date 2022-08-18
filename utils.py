@@ -323,11 +323,10 @@ def plot_color_code_map(spectra_dict, color_labels, show_cluster='all'):
         if show_cluster == 'all':
             ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
         elif show_cluster == color_labels[i]:
-            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=10)
         else:
             ax.plot(y, -x, color=plt.cm.tab20(15), marker='.', markersize=9, alpha=.3)
     remove_ticks(ax)
-    plt.show()
 
 
 def get_cluster_avgs(spectra_dict, color_labels, dbscan_clustering):
