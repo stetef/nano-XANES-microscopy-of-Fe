@@ -13,9 +13,12 @@ from scipy.optimize import minimize
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 from sklearn.metrics.pairwise import cosine_similarity
-import umap
 from sklearn.manifold import TSNE
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics.pairwise import cosine_similarity
+
+import umap
 
 
 def parse_tiff(filename):
@@ -74,7 +77,7 @@ def add_point_label(pickable, data, ax):
     mplcursors.cursor(pickable, highlight=True).connect("add", onselect)
 
 
-def get_filtered_img(data, threshold=0.02, return_mask=False):
+def get_filtered_img(data, threshold=0.05, return_mask=False):
     mask = np.zeros((data.shape[0], data.shape[1], data.shape[2]))
     bool_arr = np.max(data, axis=0) < threshold
     mask[:, bool_arr] = 1
@@ -85,7 +88,92 @@ def get_filtered_img(data, threshold=0.02, return_mask=False):
         return filtered_img
 
 
-def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=0):
+def evaluate_similarity(x, y, metric):
+    if metric == 'cosine similarity':
+        score = cosine_similarity([x], Y=[y])[0][0]
+    elif metric == 'Pearson correlation':
+        score, pval = pearsonr(x, y)
+    elif metric == '1 - $\delta$':
+        score = 1 - np.average(np.abs(x - y))
+    elif metric == '1 - MSE':
+        score = 1 - eval('mean_squared_error')(x, y)
+    elif metric == '1 - IADR':
+        score = 1 - np.sum(np.abs(x - y)) / max(np.sum(x), np.sum(y))
+    return score
+
+
+def plot_corr_matx(ax, Similarity_matrix, data_columns):
+    img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
+                    interpolation='nearest', origin='lower')
+    ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+    ax.set_title(f'{metric}', fontsize=20)
+
+    cbar = plt.colorbar(img, ax=ax)
+    cbar.ax.tick_params(labelsize=14, width=2, length=3)
+
+    N = len(Similarity_matrix)
+    ax.set_yticks(np.arange(N))
+    labels = [e.replace('_', ' ').replace('NP', '') for e in data_columns]
+    ax.set_yticklabels(labels, fontsize=14)
+
+    ax.set_xticks(np.arange(N))
+    ax.set_xticklabels(labels, fontsize=14, rotation=90)
+
+    
+def plot_MSE_hist(ax, tmp_X, Refs, bins=25,
+                  colors=[plt.cm.tab20b(17), plt.cm.tab20b(13)]):
+    exp_scores = get_least_squares_scores(tmp_X)
+
+    kwargs = {'N': len(exp_scores), 'scale': 0.03, 'dropout': 0.85}
+    x_data, coeffs = generate_linear_combos(Refs, **kwargs)
+
+    fab_scores = get_least_squares_scores(x_data)
+
+    labels = ['Experimental\ndata', 'True linear\ncombinations\n(3% noise)']
+    ax.hist([exp_scores, fab_scores], bins=bins, density=True, edgecolor='w',
+            color=colors, label=labels)
+
+    ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+    ax.set_xlabel('MSE of Least Squares Solution', fontsize=16)
+    ax.set_yticks([])
+    ax.legend(fontsize=16)
+    ax.set_xlim(.00025, 0.00190)
+
+
+def plot_expected_results(expected_results, ax):
+    labels = ['LFP', 'Pyr', 'SS', 'Hem']
+    color_labels = [17, 13, 6, 19]
+
+    for i, img in enumerate(expected_results):
+        row = i // 2
+        colm = i % 2 + row // 2
+
+        threshold = 0.025
+        mask = np.zeros((img.shape[0], img.shape[1]))
+        bool_arr = img < threshold
+        mask[bool_arr] = 1
+        filtered_img = np.ma.array(img, mask=mask)
+
+        filtered_img_dict = {}
+        for x in range(filtered_img.shape[0]):
+            for y in range(filtered_img.shape[1]):
+                if mask[x, y] == False:
+                    filtered_img_dict[(x, y)] = filtered_img[x, y]
+
+        for j, key in enumerate(list(filtered_img_dict.keys())):
+            x, y = key
+            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    patches = [mpatches.Patch(color=plt.cm.tab20(color_labels[i]),
+                              label=labels[i]) for i in range(len(labels))]
+    leg = ax.legend(handles=patches, fontsize=18, ncol=2, framealpha=0, handlelength=1., loc=1,
+                    handletextpad=0.25, columnspacing=0.7, bbox_to_anchor=(1.05, 1.03))
+
+
+def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
     fig, ax = plt.subplots(figsize=(8,6))
     pca = PCA()
     pca_components = pca.fit_transform(data)
@@ -99,8 +187,8 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=0):
             n_components = i + 1
             break
 
-    ax.plot(x, cdf, 's-', markersize=10, fillstyle='none',
-            color=plt.cm.tab10(c))
+    ax.plot(x, cdf, 's-', markersize=12, fillstyle='none',
+            color=plt.cm.tab20b(c), linewidth=3)
     ax.plot(x, np.ones(len(x)) * threshold, 'k--', linewidth=3)
 
     if show_first_PC:
@@ -136,6 +224,7 @@ def normalize_spectrum(energy, spectrum, verbose=False):
     offset = y_fit.reshape(-1)
     y_norm[whiteline:] = y_norm[whiteline:] - offset + spectrum[whiteline + 1]
     y_norm = y_norm / (spectrum[whiteline + 1])
+    #y_norm = y_norm - np.min(y_norm)
     
     if verbose:
         return whiteline, y_fit.reshape(-1), y_norm, reg
@@ -207,16 +296,29 @@ def make_PCA_traingle_plot(data, n_components):
         for j in np.arange(n_components):
             ax = axes[i, j]
             if i == j:
-                ax.hist(pca_components[:, i], color=plt.cm.tab10(0), bins=30)
+                ax.hist(pca_components[:, i], color=plt.cm.tab20b(17), bins=23)
                 ax.set_xticks([])
                 ax.set_yticks([])
             elif j < i:
-                ax.scatter(pca_components[:, i], pca_components[:, j], marker='o', s=15, 
-                           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5)
+                #ax.scatter(pca_components[:, i], pca_components[:, j], marker='o', s=15, 
+                #           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5)
+                heatmap, xedges, yedges = np.histogram2d(pca_components[:, j],
+                                                         pca_components[:, i],
+                                                         bins=23)
+                extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+                ax.imshow(heatmap.T, extent=extent, origin='lower', aspect='auto',
+                          cmap=plt.cm.gnuplot)
+                
                 ax.set_xticks([])
                 ax.set_yticks([])
             else:
                 ax.axis('off')
+
+            if j == 0:
+                ax.set_ylabel(f'$PC_{i + 1}$', fontsize=20, loc="center", rotation="horizontal")
+                ax.yaxis.set_label_coords(-0.2, 0.37)
+            if i == n_components - 1:
+                ax.set_xlabel(f'$PC_{j + 1}$', fontsize=20)
 
     max_y = 0
     for i in np.arange(n_components):
@@ -228,7 +330,6 @@ def make_PCA_traingle_plot(data, n_components):
         ax = axes[i, i]
         ax.set_ylim(0, max_y)
 
-    plt.show()
     return pca, pca_components
 
 
@@ -249,7 +350,6 @@ def show_PCs(energy, pca, n=4):
         ax.tick_params(direction='in', width=2, length=6, labelsize=14)
         ax.set_yticks([])
         ax.set_xlabel('Energy (eV)', fontsize=16)
-    plt.show()
 
 
 def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True):
@@ -260,8 +360,8 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
     color_codemap = {i: i for i in range(len(np.unique(labels)))}
     if map_colors:
         translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
-                           (90, 136): 18, (23, 37): 6, (142, 124): 19,
-                           (98, 58): 7, (101, 115): 12}
+                           (90, 136): 18, (61, 124): 7, (142, 124): 19,
+                           (98, 58): 6, (101, 115): 12}
     else:
         translation_map = {}
     
@@ -295,10 +395,16 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, di
         for j in np.arange(dimension):
             ax = axes[i, j]
             if i == j:
-                ax.hist(reduced_space[:, i], color=plt.cm.tab10(7), bins=25)
+                ax.hist(reduced_space[:, i], color=plt.cm.tab20b(17), bins=35)
             elif j < i:
-                ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=25, 
-                           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5) 
+                #ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=25, 
+                #           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5)
+                heatmap, xedges, yedges = np.histogram2d(reduced_space[:, j],
+                                                         reduced_space[:, i],
+                                                         bins=35)
+                extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+                ax.imshow(heatmap.T, extent=extent, origin='lower', aspect='auto',
+                          cmap=plt.cm.gnuplot) 
             else:
                 ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=15, 
                            color=colors)
@@ -310,13 +416,12 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, di
             ax.set_xticks([])
             ax.set_yticks([])
     plt.suptitle("UMAP", fontsize=22, y=0.92)
-    plt.show()
     
     return color_labels, codemap, dbscan_clustering
 
 
-def plot_color_code_map(spectra_dict, color_labels, show_cluster='all'):
-    fig, ax = plt.subplots(figsize=(5, 5))
+def plot_color_code_map(plot, spectra_dict, color_labels, show_cluster='all'):
+    fig, ax = plot
     for i, key in enumerate(list(spectra_dict.keys())):
         spectrum = spectra_dict[key]
         x, y = key
@@ -387,6 +492,7 @@ def objective_function(x, Refs, target, lambda1, lambda2):
     return np.sum((calc - target)**2) \
            + lambda1 * np.sum(np.abs(coeffs)) \
            + lambda2 * (np.sum(coeffs) - 1)**2
+
 
 def get_coeffs_from_spectra(spectra, Refs, lambda1=10, lambda2=1e8):
     m = Refs.shape[0]
@@ -560,7 +666,7 @@ def plot_conc_from_subset(plot, coeffs, data_columns, subset_indices, color_code
             else:
                 rot = 90
                 fontsize=18
-            if conc > 10:
+            if conc > 15:
                 ax.bar_label(rect, labels=names, label_type='center', c='k',
                              fontsize=fontsize, rotation=rot)
             
@@ -614,22 +720,26 @@ def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5):
     return Data, np.array(Coeffs)
 
 
-def histogram_of_importance(plot, x, energy, bins=50, color=plt.cm.tab20(2), fontsize=14,
+def histogram_of_importance(plot, x, energy, Refs, bins=50, color=plt.cm.tab20b(17), fontsize=14,
                             label_map=None):
     
     fig, ax = plot
     n, bin_vals, patches = ax.hist(x, bins=bins, range=(0, bins),
-                                    color=color, edgecolor='w')
+                                   color=color, edgecolor='w')
     plt.xlim(-1, bins + 1)
     nticks = 6
-    xticks = np.linspace(0, bins, nticks)
+    offset = 2
+    xticks = np.linspace(offset, bins - offset, nticks)
     ax.set_xticks(xticks)
-    labels = [energy[int((i / nticks) * len(energy))] for i in range(nticks)]
+    dE = energy[1] - energy[0]
+    energy = energy[:bins - 1]
+    labels = [energy[int((i / nticks) * len(energy))] + offset * dE for i in range(nticks)]
     ax.set_xticklabels([f'{l:.0f}' for l in labels])
     
     ax.set_ylabel('Counts', fontsize=fontsize + 2)
     ax.set_xlabel('Energy(eV)', fontsize=fontsize + 2)
     ax.tick_params(direction='out', width=2, length=6, labelsize=16)
+
     if label_map is not None:
         for idx, label in label_map.items():
             rect = patches[idx]
