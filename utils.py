@@ -6,6 +6,7 @@ import itertools
 import matplotlib.pyplot as plt
 import mplcursors
 from matplotlib.ticker import FormatStrFormatter
+import matplotlib.patches as mpatches
 from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
@@ -102,47 +103,63 @@ def evaluate_similarity(x, y, metric):
     return score
 
 
-def plot_corr_matx(ax, Similarity_matrix, data_columns):
+def plot_corr_matx(ax, Similarity_matrix, data_columns, metric):
     img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
                     interpolation='nearest', origin='lower')
     ax.tick_params(direction='out', width=2, length=6, labelsize=14)
     ax.set_title(f'{metric}', fontsize=20)
 
     cbar = plt.colorbar(img, ax=ax)
-    cbar.ax.tick_params(labelsize=14, width=2, length=3)
+    cbar.ax.tick_params(labelsize=16, width=2, length=3)
 
     N = len(Similarity_matrix)
     ax.set_yticks(np.arange(N))
     labels = [e.replace('_', ' ').replace('NP', '') for e in data_columns]
-    ax.set_yticklabels(labels, fontsize=14)
+    ax.set_yticklabels(labels, fontsize=16)
 
     ax.set_xticks(np.arange(N))
-    ax.set_xticklabels(labels, fontsize=14, rotation=90)
+    ax.set_xticklabels(labels, fontsize=16, rotation=90)
+
+
+def get_least_squares_scores(data, Refs):
+    scores = []
+
+    for i in range(len(data)):
+        print(i, end='\r')
+
+        # overdetermined solutions require least squares solutions
+        # using the least squares analytical solution
+        A = Refs.T
+        y = data[i]
+        x = np.linalg.pinv(A.T @ A) @ A.T @ y
+
+        scores.append(mean_squared_error(A @ x, y))
+
+    return np.array(scores)
 
     
 def plot_MSE_hist(ax, tmp_X, Refs, bins=25,
                   colors=[plt.cm.tab20b(17), plt.cm.tab20b(13)]):
-    exp_scores = get_least_squares_scores(tmp_X)
+    exp_scores = get_least_squares_scores(tmp_X, Refs)
 
     kwargs = {'N': len(exp_scores), 'scale': 0.03, 'dropout': 0.85}
     x_data, coeffs = generate_linear_combos(Refs, **kwargs)
 
-    fab_scores = get_least_squares_scores(x_data)
+    fab_scores = get_least_squares_scores(x_data, Refs)
 
     labels = ['Experimental\ndata', 'True linear\ncombinations\n(3% noise)']
     ax.hist([exp_scores, fab_scores], bins=bins, density=True, edgecolor='w',
             color=colors, label=labels)
-
-    ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+    ax.set_xlim(.00025, 0.00190)
+    ax.tick_params(direction='out', width=2, length=6, labelsize=13)
     ax.set_xlabel('MSE of Least Squares Solution', fontsize=16)
     ax.set_yticks([])
     ax.legend(fontsize=16)
-    ax.set_xlim(.00025, 0.00190)
 
 
 def plot_expected_results(expected_results, ax):
     labels = ['LFP', 'Pyr', 'SS', 'Hem']
-    color_labels = [17, 13, 6, 19]
+    color_labels = [12, 13, 6, 19]
 
     for i, img in enumerate(expected_results):
         row = i // 2
@@ -160,9 +177,13 @@ def plot_expected_results(expected_results, ax):
                 if mask[x, y] == False:
                     filtered_img_dict[(x, y)] = filtered_img[x, y]
 
+        alphas = np.array(list(filtered_img_dict.values()))
+        alphas = alphas - np.min(alphas)
+        alphas = alphas / np.max(alphas)
         for j, key in enumerate(list(filtered_img_dict.keys())):
             x, y = key
-            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
+            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=10,
+                    alpha=alphas[j])
 
         ax.set_xticks([])
         ax.set_yticks([])
@@ -352,14 +373,19 @@ def show_PCs(energy, pca, n=4):
         ax.set_xlabel('Energy (eV)', fontsize=16)
 
 
-def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True):
+def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True,
+                          swap_colors=False):
     points = list(filtered_spectra_dict.keys())
     point_index = {point: i for i, point in enumerate(points)}
     labels = dbscan_clustering.labels_.copy()
     
     color_codemap = {i: i for i in range(len(np.unique(labels)))}
     if map_colors:
-        translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
+        translation_map = {(60, 31): 13, (46, 69): 12, (54, 76): 7,
+                           (90, 136): 18, (61, 124): 1, (142, 124): 19,
+                           (98, 58): 6, (101, 115): 0}
+        if swap_colors:
+            translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
                            (90, 136): 18, (61, 124): 7, (142, 124): 19,
                            (98, 58): 6, (101, 115): 12}
     else:
