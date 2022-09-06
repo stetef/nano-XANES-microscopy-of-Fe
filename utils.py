@@ -103,14 +103,46 @@ def evaluate_similarity(x, y, metric):
     return score
 
 
-def plot_corr_matx(ax, Similarity_matrix, data_columns, metric):
+def get_similarity_mtx(data, metric='cosine similarity'):
+    N = len(data)
+    sim_matrix = np.zeros((N, N))
+    for i, j in itertools.product(range(N), range(N)):
+        if i <= j:
+            score = evaluate_similarity(data[i], data[j], metric)
+            sim_matrix[i, j] = score
+            sim_matrix[j, i] = score
+    return np.array(sim_matrix)
+
+
+def plot_corr_matx(ax, Similarity_matrix, data_columns, metric, rot=90,
+                   threshold=None, std=None):
     img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
                     interpolation='nearest', origin='lower')
     ax.tick_params(direction='out', width=2, length=6, labelsize=14)
     ax.set_title(f'{metric}', fontsize=20)
 
     cbar = plt.colorbar(img, ax=ax)
-    cbar.ax.tick_params(labelsize=16, width=2, length=3)
+    cbar.ax.tick_params(labelsize=16, width=2, length=4)
+    if threshold is not None:
+        cbar.ax.axhline(y=threshold, xmin=0, xmax=1, linestyle='-', linewidth=4,
+                        color='w')
+        if std is not None:
+            #cbar.ax.fill_between(x=np.arange(2), y1=threshold - std, y2=threshold + std,
+            #                     color='k', alpha=0.5)
+            cbar.ax.annotate('', xy=(0.5, threshold + std),  xycoords='data',
+                             xytext=(0.5, threshold), textcoords='data',
+                             arrowprops=dict(facecolor='w', edgecolor='w', alpha=0.8),
+                             ha='center', va='bottom')
+        cbar.ax.text(1.1, threshold, ' random\nsampling', va='bottom', ha='left', fontsize=18)
+        N = len(Similarity_matrix)
+        for i, j in itertools.product(range(N), range(N)):
+            if Similarity_matrix[i, j] > threshold:
+                if i == j:
+                    c, alpha = 'gray', 0.4
+                else:
+                    c, alpha = 'w', 0.7
+                dot = plt.Circle((i, j), 0.1, color=c, alpha=alpha)
+                ax.add_patch(dot)
 
     N = len(Similarity_matrix)
     ax.set_yticks(np.arange(N))
@@ -118,7 +150,7 @@ def plot_corr_matx(ax, Similarity_matrix, data_columns, metric):
     ax.set_yticklabels(labels, fontsize=16)
 
     ax.set_xticks(np.arange(N))
-    ax.set_xticklabels(labels, fontsize=16, rotation=90)
+    ax.set_xticklabels(labels, fontsize=16, rotation=rot)
 
 
 def get_least_squares_scores(data, Refs):
@@ -142,15 +174,15 @@ def plot_MSE_hist(ax, tmp_X, Refs, bins=25,
                   colors=[plt.cm.tab20b(17), plt.cm.tab20b(13)]):
     exp_scores = get_least_squares_scores(tmp_X, Refs)
 
-    kwargs = {'N': len(exp_scores), 'scale': 0.03, 'dropout': 0.85}
+    kwargs = {'N': len(exp_scores), 'scale': 0.02, 'dropout': 0.85}
     x_data, coeffs = generate_linear_combos(Refs, **kwargs)
 
     fab_scores = get_least_squares_scores(x_data, Refs)
 
-    labels = ['Experimental\ndata', 'True linear\ncombinations\n(3% noise)']
+    labels = ['Experimental\ndata', 'True linear\ncombinations\n(2% noise)']
     ax.hist([exp_scores, fab_scores], bins=bins, density=True, edgecolor='w',
             color=colors, label=labels)
-    ax.set_xlim(.00025, 0.00190)
+    ax.set_xlim(0.00005, 0.00085)
     ax.tick_params(direction='out', width=2, length=6, labelsize=13)
     ax.set_xlabel('MSE of Least Squares Solution', fontsize=16)
     ax.set_yticks([])
@@ -232,20 +264,20 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
     return n_components
 
 
-def normalize_spectrum(energy, spectrum, verbose=False):
+def normalize_spectrum(energy, spectrum, verbose=False, offset=0):
     whiteline = np.argmax(np.gradient(spectrum))
     
-    e_subset = energy[whiteline:].reshape(-1, 1)
-    y_subset = spectrum[whiteline:].reshape(-1, 1)
+    e_subset = energy[whiteline + offset:].reshape(-1, 1)
+    y_subset = spectrum[whiteline + offset:].reshape(-1, 1)
     
     reg = LinearRegression().fit(e_subset, y_subset)
-    y_fit = reg.predict(e_subset)
+    post_edge = energy[whiteline:].reshape(-1, 1)
+    y_fit = reg.predict(post_edge)
     
     y_norm = spectrum.copy()
-    offset = y_fit.reshape(-1)
-    y_norm[whiteline:] = y_norm[whiteline:] - offset + spectrum[whiteline + 1]
-    y_norm = y_norm / (spectrum[whiteline + 1])
-    #y_norm = y_norm - np.min(y_norm)
+    line = y_fit.reshape(-1)
+    y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
+    y_norm = y_norm / line[0]
     
     if verbose:
         return whiteline, y_fit.reshape(-1), y_norm, reg
@@ -267,7 +299,7 @@ def normalize_spectra(energy, spectra_list, spectra_dict):
 
 
 def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
-                       plot=True):
+                       plot=True, offset=0):
     if plot:
         fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
         plt.subplots_adjust(wspace=0.2, hspace=0)
@@ -276,7 +308,8 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
     intercepts = []
     whitelines = []
     for i, spectrum in enumerate(filtered_spectra[start_i:]):
-        whiteline, y_fit, y_norm, regressor = normalize_spectrum(energy, spectrum, verbose=True)
+        whiteline, y_fit, y_norm, regressor = normalize_spectrum(energy, spectrum,
+                                                                 verbose=True, offset=offset)
         coeffs.append(regressor.coef_[0][0])
         intercepts.append(regressor.intercept_[0])
         whitelines.append(whiteline)
@@ -304,7 +337,8 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
         return np.array(coeffs), np.array(intercepts), np.array(whitelines)
 
 
-def make_PCA_traingle_plot(data, n_components):
+def make_PCA_triangle_plot(data, n_components, cmap=plt.cm.gnuplot,
+                           c=plt.cm.tab20b(17), bins=23):
     
     pca = PCA(n_components=n_components)
     pca_components = pca.fit_transform(data)
@@ -317,18 +351,16 @@ def make_PCA_traingle_plot(data, n_components):
         for j in np.arange(n_components):
             ax = axes[i, j]
             if i == j:
-                ax.hist(pca_components[:, i], color=plt.cm.tab20b(17), bins=23)
+                ax.hist(pca_components[:, i], color=c, bins=bins)
                 ax.set_xticks([])
                 ax.set_yticks([])
             elif j < i:
-                #ax.scatter(pca_components[:, i], pca_components[:, j], marker='o', s=15, 
-                #           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5)
                 heatmap, xedges, yedges = np.histogram2d(pca_components[:, j],
                                                          pca_components[:, i],
-                                                         bins=23)
+                                                         bins=bins)
                 extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-                ax.imshow(heatmap.T, extent=extent, origin='lower', aspect='auto',
-                          cmap=plt.cm.gnuplot)
+                ax.imshow(np.log(heatmap.T + 0.8), extent=extent, origin='lower', aspect='auto',
+                          cmap=cmap)
                 
                 ax.set_xticks([])
                 ax.set_yticks([])
@@ -385,9 +417,9 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
                            (90, 136): 18, (61, 124): 1, (142, 124): 19,
                            (98, 58): 6, (101, 115): 0}
         if swap_colors:
-            translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 17,
-                           (90, 136): 18, (61, 124): 7, (142, 124): 19,
-                           (98, 58): 6, (101, 115): 12}
+            translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 12,
+                               (90, 136): 18, (61, 124): 13, (142, 124): 19,
+                               (98, 58): 6, (101, 115): 6}
     else:
         translation_map = {}
     
@@ -402,7 +434,9 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
     return translated_colors, color_codemap
 
 
-def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, dimension=4, eps=1):
+def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
+                   dimension=4, eps=1, cmap=plt.cm.gnuplot, c=plt.cm.tab20(17),
+                   bins=35):
 
     reducer = umap.UMAP(random_state=42, n_components=dimension,
                         n_neighbors=n_neighbors, min_dist=min_dist)
@@ -421,16 +455,14 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0, di
         for j in np.arange(dimension):
             ax = axes[i, j]
             if i == j:
-                ax.hist(reduced_space[:, i], color=plt.cm.tab20b(17), bins=35)
+                ax.hist(reduced_space[:, i], color=c, bins=bins)
             elif j < i:
-                #ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=25, 
-                #           color=plt.cm.tab10(1), edgecolor='w', linewidth=0.5)
                 heatmap, xedges, yedges = np.histogram2d(reduced_space[:, j],
                                                          reduced_space[:, i],
-                                                         bins=35)
+                                                         bins=bins)
                 extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-                ax.imshow(heatmap.T, extent=extent, origin='lower', aspect='auto',
-                          cmap=plt.cm.gnuplot) 
+                ax.imshow(np.log(heatmap.T + 10), extent=extent, origin='lower', aspect='auto',
+                          cmap=cmap) 
             else:
                 ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=15, 
                            color=colors)
@@ -472,13 +504,13 @@ def get_cluster_avgs(spectra_dict, color_labels, dbscan_clustering):
     return cluster_avgs
 
 
-def plot_cluster_avgs(energy, cluster_avgs, codemap):
-    fig, axes = plt.subplots(figsize=(20, 2), ncols=len(cluster_avgs))
-    plt.subplots_adjust(wspace=0)
+def plot_cluster_avgs(plot, energy, cluster_avgs, codemap, linewidth=4.5):
+    fig, axes = plot
+    ncols = len(cluster_avgs)
 
     for i, key in enumerate(list(cluster_avgs.keys())):
         axes[i].plot(energy, cluster_avgs[key] / np.sum(cluster_avgs[key]),
-                     linewidth=4.5, alpha=0.6, c=plt.cm.tab20(codemap[i]))
+                     linewidth=linewidth, alpha=0.6, c=plt.cm.tab20(codemap[i]))
 
     label_map = {0: 'I', 1: 'II', 2: 'III', 3: 'IV', 4: 'V', 5: 'VI', 6: 'VII', 7: 'VIII',
                  8: 'IX', 9: 'X', 10: 'XI', 11: 'XII', 12: 'XIII'}
@@ -489,6 +521,31 @@ def plot_cluster_avgs(energy, cluster_avgs, codemap):
         ax.set_xlabel('Energy (eV)', fontsize=12)
         ax.text(7175, 0.2 * ax.get_ylim()[1], label_map[i], fontsize=24, ha='center', va='center',
                 c=plt.cm.tab20(codemap[i]))
+
+
+def plot_spaghetti_by_cluster(ax, energy, normalized_spectra, avg_spectra,
+                              color_labels, labels, codemap):    
+    n_clusters = len(avg_spectra)
+    dys = np.arange(n_clusters)
+    colors = np.unique(color_labels)
+    color_to_cluster = {v: k for k, v in codemap.items()}
+
+    for i, spectrum in enumerate(normalized_spectra):
+        c = color_labels[i]
+        cluster = color_to_cluster[c]
+        ax.plot(energy, spectrum + cluster, linewidth=2, alpha=0.03,
+                color=plt.cm.tab20(c))
+
+    for color in colors:
+        cluster = color_to_cluster[color]
+        ax.text(energy[1], cluster + 0.1, labels[cluster], fontsize=24, 
+                color=plt.cm.tab20(color))
+        #ax.plot(energy, avg_spectra[cluster] + cluster, linewidth=3, alpha=1.,
+        #        color=plt.cm.tab20(14))
+
+    ax.set_yticks([])
+    ax.tick_params(length=6, width=2, labelsize=16)
+    ax.set_xlabel('Energy (eV)', fontsize=18)
 
 
 def chi_square(data, fit, sigma_squared=1):
