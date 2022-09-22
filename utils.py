@@ -133,7 +133,7 @@ def plot_corr_matx(ax, Similarity_matrix, data_columns, metric, rot=90,
                              xytext=(0.5, threshold), textcoords='data',
                              arrowprops=dict(facecolor='w', edgecolor='w', alpha=0.8),
                              ha='center', va='bottom')
-        cbar.ax.text(1.1, threshold, ' random\nsampling', va='bottom', ha='left', fontsize=18)
+        cbar.ax.text(1.1, threshold, ' random\nsampling', va='center', ha='left', fontsize=18)
         N = len(Similarity_matrix)
         for i, j in itertools.product(range(N), range(N)):
             if Similarity_matrix[i, j] > threshold:
@@ -264,11 +264,11 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
     return n_components
 
 
-def normalize_spectrum(energy, spectrum, verbose=False, offset=0):
+def normalize_spectrum(energy, spectrum, verbose=False):
     whiteline = np.argmax(np.gradient(spectrum))
     
-    e_subset = energy[whiteline + offset:].reshape(-1, 1)
-    y_subset = spectrum[whiteline + offset:].reshape(-1, 1)
+    e_subset = energy[whiteline:].reshape(-1, 1)
+    y_subset = spectrum[whiteline:].reshape(-1, 1)
     
     reg = LinearRegression().fit(e_subset, y_subset)
     post_edge = energy[whiteline:].reshape(-1, 1)
@@ -299,7 +299,7 @@ def normalize_spectra(energy, spectra_list, spectra_dict):
 
 
 def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
-                       plot=True, offset=0):
+                       plot=True):
     if plot:
         fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
         plt.subplots_adjust(wspace=0.2, hspace=0)
@@ -309,7 +309,7 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
     whitelines = []
     for i, spectrum in enumerate(filtered_spectra[start_i:]):
         whiteline, y_fit, y_norm, regressor = normalize_spectrum(energy, spectrum,
-                                                                 verbose=True, offset=offset)
+                                                                 verbose=True)
         coeffs.append(regressor.coef_[0][0])
         intercepts.append(regressor.intercept_[0])
         whitelines.append(whiteline)
@@ -406,20 +406,26 @@ def show_PCs(energy, pca, n=4):
 
 
 def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True,
-                          swap_colors=False):
+                          translation=1):
     points = list(filtered_spectra_dict.keys())
     point_index = {point: i for i, point in enumerate(points)}
     labels = dbscan_clustering.labels_.copy()
     
     color_codemap = {i: i for i in range(len(np.unique(labels)))}
     if map_colors:
-        translation_map = {(60, 31): 13, (46, 69): 12, (54, 76): 7,
-                           (90, 136): 18, (61, 124): 1, (142, 124): 19,
-                           (98, 58): 6, (101, 115): 0}
-        if swap_colors:
-            translation_map = {(60, 31): 13, (46, 69): 16, (54, 76): 12,
-                               (90, 136): 18, (61, 124): 13, (142, 124): 19,
-                               (98, 58): 6, (101, 115): 6}
+        if translation == 1:
+            translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
+                               (47, 69): 12}
+        elif translation == 2:
+            translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
+                               (47, 69): 12, (74, 46): 7, (73, 65): 0}
+        elif translation == 3:
+            translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
+                               (47, 69): 12, (74, 46): 8, (73, 65): 0,
+                               (18, 38): 7}
+        elif translation == 4:
+            translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
+                               (74, 46): 12, (73, 65): 0, (60, 124): 2}
     else:
         translation_map = {}
     
@@ -436,7 +442,7 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
 
 def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
                    dimension=4, eps=1, cmap=plt.cm.gnuplot, c=plt.cm.tab20(17),
-                   bins=35):
+                   bins=35, translation=1):
 
     reducer = umap.UMAP(random_state=42, n_components=dimension,
                         n_neighbors=n_neighbors, min_dist=min_dist)
@@ -444,7 +450,8 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
 
     dbscan_clustering = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
     cluster_dict = {loc: dbscan_clustering.labels_[i] for i, loc in enumerate(list(spectra_dict.keys()))}
-    color_labels, codemap = get_translated_colors(dbscan_clustering, spectra_dict)
+    color_labels, codemap = get_translated_colors(dbscan_clustering, spectra_dict,
+                                                  translation=translation)
     colors = [plt.cm.tab20(c) for c in color_labels]
 
     fig, axes = plt.subplots(figsize=(2 * dimension, 2 * dimension),
@@ -675,7 +682,7 @@ def plot_recon_grid(energy, targets, subset_indices, subsets, scales, coeffs, Re
                 ax = axes[i, j]
                 if i * ncols + j < m:
                     ax.plot(energy, targets[i * ncols + j], '-', linewidth=3, label='target',
-                            c=plt.cm.tab10(0))
+                            c=plt.cm.tab10(7))
                     ax.plot(energy, preds[i * ncols + j], '--', linewidth=3, label='fit',
                             c=plt.cm.tab10(c))
                     max_i = subset_indices[i * ncols + j][np.argmax(coeffs[i * ncols + j])]
@@ -796,7 +803,7 @@ def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5):
         else:
             noise = 0
         x = Refs.T @ coeffs
-        x = x - np.min(x)
+        #x = x - np.min(x)
         Data.append(x + noise)
         Coeffs.append(coeffs)
     Data = np.array(Data)
@@ -862,10 +869,10 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
     
     bins = basis.shape[1]
     n_reps = len(Is)
-    colors = [plt.cm.RdPu(i / n_reps) for i in range(n_reps)]
+    colors = [plt.cm.RdPu( (i + 1) / (n_reps + 1)) for i in range(n_reps)]
     n, bin_vals, patches = axes[2].hist(Is.T, bins=bins, range=(0, bins), edgecolor='w',
                                         linewidth=0.5, color=colors, stacked=True, alpha=1.)
-    axes[2].plot(var / np.max(var) * np.max(n), color='k', linewidth=2)
+    axes[2].plot(var / np.max(var) * np.max(n), color='k', linewidth=3)
     if loc == 1:
         axes[2].text(0.98, 0.98, f'n = {best_n}', fontsize=22, transform=ax.transAxes,
                      va='top', ha='right')

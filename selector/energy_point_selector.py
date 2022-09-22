@@ -3,6 +3,7 @@
 import numpy as np
 
 from sklearn.feature_selection import RFE
+from sklearn.feature_selection import RFECV
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
@@ -30,9 +31,6 @@ class Selector:
                              scoring='neg_root_mean_squared_error',
                              **kwargs):
         """Return the n_points that are most important."""
-        if n_points is None:
-            n_points = len(self.Data)
-
         if estimator.lower().replace(' ', '') in ['linear',
                                                   'linearregression']:
             model = LinearRegression(**kwargs)
@@ -48,7 +46,12 @@ class Selector:
                   "Setting to default Decision Tree Regressor.")
             model = DecisionTreeRegressor(**kwargs)
 
-        rfe = RFE(model, n_features_to_select=n_points, step=1)
+        if n_points is None:
+            cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
+            rfe = RFECV(model, step=1, cv=cv, scoring=scoring)
+        else:
+            rfe = RFE(model, n_features_to_select=n_points, step=1)
+
         self.rfe = rfe.fit(self.Data, self.Coeffs)
 
         if verbose:
