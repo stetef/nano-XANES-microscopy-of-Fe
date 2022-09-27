@@ -48,9 +48,9 @@ class Selector:
 
         if n_points is None:
             cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
-            rfe = RFECV(model, step=1, cv=cv, scoring=scoring)
+            rfe = RFECV(model, step=5, cv=cv, scoring=scoring)
         else:
-            rfe = RFE(model, n_features_to_select=n_points, step=1)
+            rfe = RFE(model, n_features_to_select=n_points, step=5)
 
         self.rfe = rfe.fit(self.Data, self.Coeffs)
 

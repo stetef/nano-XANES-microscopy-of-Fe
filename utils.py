@@ -3,20 +3,24 @@
 import numpy as np
 import itertools
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import mplcursors
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import MultipleLocator
 import matplotlib.patches as mpatches
 from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
+from scipy.stats import pearsonr
 
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.manifold import TSNE
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
+
 from sklearn.metrics.pairwise import cosine_similarity
 
 import umap
@@ -100,6 +104,8 @@ def evaluate_similarity(x, y, metric):
         score = 1 - eval('mean_squared_error')(x, y)
     elif metric == '1 - IADR':
         score = 1 - np.sum(np.abs(x - y)) / max(np.sum(x), np.sum(y))
+    elif metric == '$R^2$':
+        score = r2_score(x, y, multioutput='variance_weighted')
     return score
 
 
@@ -119,16 +125,30 @@ def plot_corr_matx(ax, Similarity_matrix, data_columns, metric, rot=90,
     img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
                     interpolation='nearest', origin='lower')
     ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+    if metric == 'cosine similarity':
+        metric = 'cos. sim. \n$ \equiv \\frac{ \sum \; y_i \; \hat{y}_i }' +\
+                 '{ \sqrt{ \sum y_i^2 \;} \sqrt{ \sum \; \hat{y}_i^2 } } $'
+    elif metric == 'Pearson correlation':
+        metric = 'Pearson \n$r_{y \hat{y}} \equiv \\frac{ \sum \; y_i \hat{y}_i - N \;' + \
+                 '\overline{y} \; \hat{\overline{y}} }' + \
+                 '{ \sqrt{ \sum \; y_i^2 - N \; \overline{y} \; ^2 } ' + \
+                 '\sqrt{ \sum \; \hat{y}_i^2 - N \; \hat{\overline{y}} \; ^2 } }$'
+    elif metric == '$R^2$':
+        metric = metric + '\n$\equiv 1 - \\frac{ \sum (y_i - \hat{y}_i)^2}' + \
+                 '{\sum (y_i - \overline{y})^2}$'
+    elif metric == '1 - $\delta$':
+        metric = metric + '\n$\equiv 1 - \\frac{ \sum \; |y_i - \hat{y}_i|}{N}$'
+    elif metric == '1 - IADR':
+        metric = '1 - I.A.D.R.\n$\equiv 1 - \\frac{ \sum \; |y_i - \hat{y}_i|}' + \
+                 '{ max \\{ \sum \; y_{i}, \sum \; \hat{y}_{i} \\} }$'
     ax.set_title(f'{metric}', fontsize=20)
 
-    cbar = plt.colorbar(img, ax=ax)
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
     cbar.ax.tick_params(labelsize=16, width=2, length=4)
     if threshold is not None:
         cbar.ax.axhline(y=threshold, xmin=0, xmax=1, linestyle='-', linewidth=4,
                         color='w')
         if std is not None:
-            #cbar.ax.fill_between(x=np.arange(2), y1=threshold - std, y2=threshold + std,
-            #                     color='k', alpha=0.5)
             cbar.ax.annotate('', xy=(0.5, threshold + std),  xycoords='data',
                              xytext=(0.5, threshold), textcoords='data',
                              arrowprops=dict(facecolor='w', edgecolor='w', alpha=0.8),
@@ -264,6 +284,111 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
     return n_components
 
 
+def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=10,
+                       whiteline=None, y_fit_pre=None, y_fit_post=None):
+    if whiteline is None:
+        whiteline = np.argmax(np.gradient(spectrum))
+
+    if y_fit_post is None:
+        e_post = energy[whiteline:].reshape(-1, 1)
+        y_post = spectrum[whiteline:].reshape(-1, 1)
+        
+        reg_post = LinearRegression().fit(e_post, y_post)
+        post_edge = energy[whiteline:].reshape(-1, 1)
+        y_fit_post = reg_post.predict(post_edge)
+
+    y_norm = spectrum.copy()
+
+    if y_fit_pre is None:
+        if pre_edge_offset is 'none':
+            y_fit_pre = y_norm[0]
+        else:
+            e_pre = energy[:whiteline - pre_edge_offset].reshape(-1, 1)
+            y_pre = y_norm[:whiteline - pre_edge_offset].reshape(-1, 1)
+            reg_pre = LinearRegression().fit(e_pre, y_pre)
+            y_fit_pre = reg_pre.predict(energy.reshape(-1, 1)).reshape(-1)
+    
+    y_norm = y_norm - y_fit_pre
+
+    line = y_fit_post.reshape(-1) 
+    y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
+    
+    if y_fit_pre.shape == ():
+        y_norm = y_norm / (line[0] - y_fit_pre)
+    else:
+        y_norm = y_norm / (line[0] - y_fit_pre[whiteline])
+
+    if verbose:
+        return whiteline, y_fit_pre.reshape(-1), y_fit_post.reshape(-1), y_norm
+    else:
+        return y_norm
+
+
+def normalize_spectra(energy, spectra_list, spectra_dict):
+    normalized_spectra = []
+    for spectrum in spectra_list:
+        y_norm = normalize_spectrum(energy, spectrum)
+        normalized_spectra.append(y_norm)
+
+    normalized_spectra_dict = {}
+    for i, key in enumerate(list(spectra_dict.keys())):
+        normalized_spectra_dict[key] = normalized_spectra[i]
+        
+    return normalized_spectra, normalized_spectra_dict
+
+
+def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
+                       plot=True, pre_edge_offset=10):
+    if plot:
+        fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
+        plt.subplots_adjust(wspace=0.2, hspace=0)
+
+    pre_edge_fits = []
+    post_edge_fits = []
+    whitelines = []
+    for i, spectrum in enumerate(filtered_spectra[start_i:]):
+        whiteline, y_fit_pre, y_fit_post, y_norm = normalize_spectrum(energy, spectrum,
+                                                                      pre_edge_offset=pre_edge_offset,
+                                                                      verbose=True)
+        pre_edge_fits.append(y_fit_pre)
+        post_edge_fits.append(y_fit_post)
+        whitelines.append(whiteline)
+
+        if plot:
+            ax = axes[i, 0]
+            ax.plot(energy, spectrum)
+            ax.plot(energy[whiteline], spectrum[whiteline],
+                    's', c='k', markersize=10, fillstyle='none')
+            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=plt.cm.tab10(1))
+            ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)
+            if pre_edge_offset is 'none':
+                ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
+            else:
+                ax.plot(energy, y_fit_pre, 'k--', linewidth=1)
+
+            ax = axes[i, 1]
+            ax.plot(energy, y_norm)
+
+            for ax in axes[i]:
+                ax.set_xlabel('Energy (eV)', fontsize=16)
+                ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+                ax.tick_params(rotation=30, axis='x')
+                ax.grid(axis='x')
+                ax.xaxis.set_major_locator(MultipleLocator(20))
+                if i != N - 1:
+                    ax.set_xlabel(None)
+                    ax.xaxis.set_ticklabels([])
+                    ax.xaxis.set_ticks_position('none')  
+
+        if i == N - 1:
+            break
+            
+    if return_params:
+        return np.array(pre_edge_fits), post_edge_fits, np.array(whitelines)
+    elif plot:
+        return fig, axes
+
+"""
 def normalize_spectrum(energy, spectrum, verbose=False):
     whiteline = np.argmax(np.gradient(spectrum))
     
@@ -283,21 +408,9 @@ def normalize_spectrum(energy, spectrum, verbose=False):
         return whiteline, y_fit.reshape(-1), y_norm, reg
     else:
         return y_norm
+"""
 
-
-def normalize_spectra(energy, spectra_list, spectra_dict):
-    normalized_spectra = []
-    for spectrum in spectra_list:
-        y_norm = normalize_spectrum(energy, spectrum)
-        normalized_spectra.append(y_norm)
-
-    normalized_spectra_dict = {}
-    for i, key in enumerate(list(spectra_dict.keys())):
-        normalized_spectra_dict[key] = normalized_spectra[i]
-        
-    return normalized_spectra, normalized_spectra_dict
-
-
+"""
 def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
                        plot=True):
     if plot:
@@ -335,7 +448,7 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
             
     if return_params:
         return np.array(coeffs), np.array(intercepts), np.array(whitelines)
-
+"""
 
 def make_PCA_triangle_plot(data, n_components, cmap=plt.cm.gnuplot,
                            c=plt.cm.tab20b(17), bins=23):
@@ -611,8 +724,9 @@ def get_goodness_of_fit_from_subset(subset, target, lambda1=10, lambda2=1e8):
                                                  lambda1=lambda1, lambda2=lambda2)
     recon = coeffs_hat @ subset * scales
     recon = recon.reshape(-1)
-    recon = recon - np.min(recon)
-    score = chi_square(target, recon)
+    #recon = recon - np.min(recon)
+    #score = chi_square(target, recon)
+    score = r2_score(target, recon, multioutput='variance_weighted')
     return score
 
 
@@ -891,3 +1005,119 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
             height += h
         ax.text(rect.get_x() + rect.get_width() / 2, height + 0, label,
                 ha='center', va='bottom', fontsize=14)
+
+
+def get_RFE_results(base_estimator, x, basis, Ns, reps, n_estimators=1,
+                    plot=False, select_n_for_me=False, verbose=True,
+                    scoring='neg_root_mean_squared_error', **kwargs):
+
+    if plot:
+        fig = plt.figure(figsize=(16, 3 * len(Ns)))
+        spec = fig.add_gridspec(ncols=3, nrows=len(Ns), width_ratios=[0.5, 0.5, 1.0])
+        plt.subplots_adjust(wspace=0.15, hspace=0.2)
+
+    Scores = []
+
+    for row, best_n in enumerate(Ns):
+        if select_n_for_me:
+            best_n = None
+
+        print(f'n = {best_n}')
+        Is = []
+        scores = []
+        for rep in range(reps):
+            print(rep, end='\r')
+            data, coeffs = generate_linear_combos(basis, **kwargs)
+
+            select = energy_point_selector.Selector(data, coeffs)
+            if base_estimator == 'Random Forest':
+                if verbose:
+                    rfe, score = select.select_energy_points(estimator=base_estimator, n_points=best_n,
+                                                             verbose=verbose, scoring=scoring,
+                                                             n_estimators=n_estimators)
+                    scores.append(score)
+                else:
+                    rfe = select.select_energy_points(estimator=base_estimator, n_points=best_n,
+                                                      verbose=verbose, scoring=scoring,
+                                                      n_estimators=n_estimators)
+            else:
+                if verbose:
+                    rfe, score = select.select_energy_points(estimator=base_estimator, n_points=best_n,
+                                                             verbose=verbose, scoring=scoring)
+                    scores.append(score)
+                else:
+                    rfe = select.select_energy_points(estimator=base_estimator, n_points=best_n,
+                                                      verbose=verbose, scoring=scoring)
+            energy_measurements = x[rfe.support_]
+
+            indices = [i for i, e in enumerate(x) if e in energy_measurements]
+            Is.append(indices)
+
+        if select_n_for_me:
+            Is = np.array(Is, dtype=object)
+        else:
+            Is = np.array(Is)
+
+        if plot:
+            axes = [fig.add_subplot(spec[row, j]) for j in range(3)]
+
+            if row == 0:
+                axes[0].set_title('Basis set\n& variance (black)', fontsize=20)
+                axes[1].set_title(f'Training dataset\nN = {N}', fontsize=20)
+                title = '$N_{reps} = ' + f'{reps}$'
+                if base_estimator == 'Random Forest':   
+                    title = '$N_{estimators} = ' + f'{n_estimators}$\n' + title
+                axes[2].set_title(title, fontsize=20)
+
+        if select_n_for_me:
+            best_n = f'{rfe.n_features_}*'
+
+        indices = []
+        if plot:
+            plot_RFE_results(axes, x, basis, indices, Is, best_n, colors, leg=False, **kwargs)
+        Scores.append(scores)
+
+    model = base_estimator.replace(" ", "_")
+
+    if plot:
+        if model == 'Linear_Regression':
+            plt.savefig(f'Figures/test_RFE_results_gaussian_{model}_{reps}_reps.png',
+                        dpi=600, bbox_inches='tight', transparent=False)
+        else:
+            plt.savefig(f'Figures/test_RFE_results_gaussian_{model}_w_{n_estimators}_dts.png',
+                        dpi=600, bbox_inches='tight', transparent=False)
+            
+    elif verbose: 
+        return Scores
+
+
+def plot_RFE_cv_scores(plot, Scores, base_estimator, n_estimators, N,
+                       socring):
+    fig, ax = plot
+
+    title = base_estimator
+    if base_estimator == 'Random Forest':
+        title = title + '\n$n_{estimators} = ' + f'{n_estimators}$'
+        c = 2
+    else:
+        c = 0
+    title = title + '\nN = ' + f'{N}'
+
+    ax.plot(Ns, np.average(Scores, axis=1), 'o-', color=plt.cm.tab20(c),
+            linewidth=3, markersize=10)
+    ax.fill_between(Ns, np.average(Scores, axis=1) - np.std(Scores, axis=1), 
+                    np.average(Scores, axis=1) + np.std(Scores, axis=1),
+                    color=plt.cm.tab20(c + 1))
+
+    ax.set_xlabel('n', fontsize=18)
+    
+    if scoring == 'neg_root_mean_squared_error':
+        ylabel = '-RMSE'
+    elif scoring == 'r2':
+        ylabel = '$R^2$'
+    else:
+        ylabel = scoring.replace('_', ' ')
+    
+    ax.set_ylabel(ylabel, fontsize=18)
+    ax.tick_params(width=1.5, length=8, direction='out', labelsize=16)
+    ax.set_title(title, fontsize=18)
