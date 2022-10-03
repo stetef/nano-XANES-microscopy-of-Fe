@@ -9,6 +9,8 @@ import mplcursors
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MultipleLocator
 import matplotlib.patches as mpatches
+from matplotlib.offsetbox import AnchoredOffsetbox, TextArea
+from matplotlib.offsetbox import HPacker, VPacker, AnnotationBbox
 from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
@@ -724,38 +726,103 @@ def get_goodness_of_fit_from_subset(subset, target, lambda1=10, lambda2=1e8):
                                                  lambda1=lambda1, lambda2=lambda2)
     recon = coeffs_hat @ subset * scales
     recon = recon.reshape(-1)
-    #recon = recon - np.min(recon)
-    #score = chi_square(target, recon)
-    score = r2_score(target, recon, multioutput='variance_weighted')
+    score = 1 - r2_score(target, recon, multioutput='variance_weighted')
     return score
 
 
-def LCF(target, basis, subset_size, eps=1e-6, lambda1=10, lambda2=1e8, verbose=True):
+def sort_by_x(x, y):
+    sorted_indices = np.argsort(x)
+    x = [x[i] for i in sorted_indices]
+    y = [y[i] for i in sorted_indices]
+    return x, y
+
+
+def get_fit_params_from_indices(indices, basis, target, lambda1=10, lambda2=1e8):
+    subset, _, _ = get_sets_from_subset_indices(indices, basis)
+    scales, coeffs_hat = get_coeffs_from_spectra([target], subset,
+                                                 lambda1=lambda1, lambda2=lambda2)
+    return subset, scales, coeffs_hat
+
+
+def LCF(target, basis, subset_size, eps=1e-16, lambda1=10, lambda2=1e8, verbose=False,
+        reps=5):
     
     indices = np.arange(basis.shape[0])     
-    best_score = np.inf
-    best_subset_indices = np.zeros(subset_size)
+    best_subset_indices = list(np.tile(np.zeros(subset_size), reps).reshape(reps, subset_size))
+    best_scores = list(np.zeros(reps))
     
     i = 0
+    k = 0
     for subset_indices in itertools.combinations(indices, subset_size):
         print(i + 1, end='\r')
         subset_indices = np.array(subset_indices)
         subset, non_subset_indices, non_subset = get_sets_from_subset_indices(subset_indices, basis) 
         set_tuple = (subset, subset_indices, non_subset, non_subset_indices)
         score = get_goodness_of_fit_from_subset(subset, target, lambda1=lambda1, lambda2=lambda2)
-        if score < best_score:
-            best_score = score.copy()
-            best_subset_indices = subset_indices.copy()
-            if best_score < eps:
-                break
-        i += 1            
-        subset_indices = best_subset_indices
-        subset, _, _ = get_sets_from_subset_indices(subset_indices, basis)
+        if i < reps:
+            best_scores[k] = score.copy()
+            best_subset_indices[k] = subset_indices.copy()
+            k += 1
+        if i == reps:
+            best_scores, best_subset_indices = sort_by_x(best_scores, best_subset_indices)
+        if i >= reps and score < best_scores[-1]:
+            best_scores.append(score.copy())
+            best_subset_indices.append(subset_indices.copy())
+            best_scores, best_subset_indices = sort_by_x(best_scores, best_subset_indices)
+            best_scores = best_scores[:-1]
+            best_subset_indices = best_subset_indices[:-1]  
+        
+        if best_scores[0] < eps:
+            print(f"Best score less than {eps}")
+            break
+        
+        i += 1      
     
     if verbose:
-        print(subset_indices, best_score)
-    scales, coeffs_hat = get_coeffs_from_spectra([target], subset, lambda1=lambda1, lambda2=lambda2)
-    return subset_indices, subset, scales, coeffs_hat, best_score
+        print(best_subset_indices[0], best_scores[0])
+        return best_subset_indices, best_scores
+    else:
+        subset, scales, coeffs_hat = get_fit_params_from_indices(best_subset_indices[0], basis, target,
+                                                                 lambda1=lambda1, lambda2=lambda2)
+        return best_subset_indices[0], subset, scales, coeffs_hat, best_scores[0]
+
+
+def format_bar_axes(ax, n, labels):
+    ax.tick_params(labelsize=14, width=2, length=4)
+    ax.set_yticks(np.arange(n))
+    ax.set_yticklabels(labels, fontsize=16)
+    ax.set_ylim(-0.5, n - 0.5)
+    for s in ['top', 'bottom', 'right']:
+        ax.spines[s].set_visible(False)
+    ax.set_xticks([])
+    ax.set_xlim(0, 1.05)
+    ax.grid(axis='x', zorder=1)
+    ax.xaxis.set_major_locator(MultipleLocator(0.25))
+    ax.xaxis.set_ticklabels([])
+    ax.xaxis.set_ticks_position('none')
+
+
+def add_multicolored_xlabel(ax, labels, colors, fontsize=16):
+    boxes = []
+    for i in range(len(labels)):
+        box = TextArea(labels[i], textprops=dict(color=colors[i], size=fontsize,
+                                                 ha='center', va='bottom'))
+        boxes.append(box)
+    box = VPacker(children=boxes, align="bottom", pad=0, sep=-12)
+    anchored_box = AnchoredOffsetbox(loc='upper center', child=box, pad=0., frameon=False,
+                                     bbox_to_anchor=(0.5, -0.05), 
+                                     bbox_transform=ax.transAxes, borderpad=0)
+    ax.add_artist(anchored_box)
+
+    
+def get_uniqueness_cost(coeffs, subset, best_contribs, subset_size):
+    sorted_coeffs, sorted_subset = sort_by_x(coeffs, subset)
+    contribs = np.array([sorted_coeffs[k] * sorted_subset[k]
+                         for k in range(subset_size)])
+    uniquesness_score = [r2_score(contribs[l], best_contribs[l],
+                                  multioutput='variance_weighted')
+                         for l in range(subset_size)]
+    return uniquesness_score
 
 
 def label_ax_with_score(ax, target, pred, sub_idxs, conc, flag=False):
@@ -973,7 +1040,7 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
         axes[1].plot(x, d, color='gray', alpha=0.1, linewidth=3)
 
     var = np.std(data, axis=0)
-    axes[1].plot(x, var, color='k', linewidth=2)
+    axes[1].plot(x, var, color='k', linewidth=2, alpha=0.5)
 
     for ax in axes:
         ax.tick_params(width=2, length=6, labelsize=15, direction='in')
