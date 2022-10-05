@@ -248,7 +248,8 @@ def plot_expected_results(expected_results, ax):
                     handletextpad=0.25, columnspacing=0.7, bbox_to_anchor=(1.05, 1.03))
 
 
-def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
+def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17,
+                    xy=(0.7, 0.3)):
     fig, ax = plt.subplots(figsize=(8,6))
     pca = PCA()
     pca_components = pca.fit_transform(data)
@@ -258,7 +259,10 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17):
     cdf = [np.sum(pca.explained_variance_ratio_[:i + 1]) for i in range(n)]
     for i, val in enumerate(cdf):
         if val > threshold:
-            print(f"It takes {i + 1} PCs to explain {int(threshold*100)}% variance.")
+            text = f"It takes {i + 1} PCs to explain\n{int(threshold*100)}% variance."
+            print(text)
+            ax.text(xy[0], xy[1], text, va='center', ha='center', fontsize=20,
+                    transform=ax.transAxes)
             n_components = i + 1
             break
 
@@ -302,7 +306,7 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=10,
     y_norm = spectrum.copy()
 
     if y_fit_pre is None:
-        if pre_edge_offset is 'none':
+        if pre_edge_offset == 'none':
             y_fit_pre = y_norm[0]
         else:
             e_pre = energy[:whiteline - pre_edge_offset].reshape(-1, 1)
@@ -326,10 +330,12 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=10,
         return y_norm
 
 
-def normalize_spectra(energy, spectra_list, spectra_dict):
+def normalize_spectra(energy, spectra_list, spectra_dict,
+                      pre_edge_offset=10):
     normalized_spectra = []
     for spectrum in spectra_list:
-        y_norm = normalize_spectrum(energy, spectrum)
+        y_norm = normalize_spectrum(energy, spectrum,
+                                    pre_edge_offset=pre_edge_offset)
         normalized_spectra.append(y_norm)
 
     normalized_spectra_dict = {}
@@ -363,7 +369,7 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
                     's', c='k', markersize=10, fillstyle='none')
             ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=plt.cm.tab10(1))
             ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)
-            if pre_edge_offset is 'none':
+            if pre_edge_offset == 'none':
                 ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
             else:
                 ax.plot(energy, y_fit_pre, 'k--', linewidth=1)
@@ -533,7 +539,7 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
                                (47, 69): 12}
         elif translation == 2:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
-                               (47, 69): 12, (74, 46): 7, (73, 65): 0}
+                               (47, 69): 12, (74, 46): 7}
         elif translation == 3:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
                                (47, 69): 12, (74, 46): 8, (73, 65): 0,
@@ -778,8 +784,8 @@ def LCF(target, basis, subset_size, eps=1e-16, lambda1=10, lambda2=1e8, verbose=
         
         i += 1      
     
+    print(best_subset_indices[0], best_scores[0])
     if verbose:
-        print(best_subset_indices[0], best_scores[0])
         return best_subset_indices, best_scores
     else:
         subset, scales, coeffs_hat = get_fit_params_from_indices(best_subset_indices[0], basis, target,
@@ -819,9 +825,8 @@ def get_uniqueness_cost(coeffs, subset, best_contribs, subset_size):
     sorted_coeffs, sorted_subset = sort_by_x(coeffs, subset)
     contribs = np.array([sorted_coeffs[k] * sorted_subset[k]
                          for k in range(subset_size)])
-    uniquesness_score = [r2_score(contribs[l], best_contribs[l],
-                                  multioutput='variance_weighted')
-                         for l in range(subset_size)]
+    uniquesness_score = r2_score(best_contribs, contribs,
+                                 multioutput='variance_weighted')
     return uniquesness_score
 
 
