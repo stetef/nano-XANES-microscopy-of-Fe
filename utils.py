@@ -15,6 +15,7 @@ from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
 from scipy.stats import pearsonr
+from scipy.stats import norm
 
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
@@ -541,12 +542,11 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
                                (47, 69): 12, (74, 46): 7}
         elif translation == 3:
-            translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
-                               (47, 69): 12, (74, 46): 8, (73, 65): 0,
-                               (18, 38): 7}
+            translation_map = {(59, 49): 13, (126, 114): 19,
+                               (47, 69): 7, (74, 46): 12}
         elif translation == 4:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
-                               (74, 46): 12, (73, 65): 0, (60, 124): 2}
+                               (74, 46): 12, (73, 65): 7, (60, 124): 0}
     else:
         translation_map = {}
     
@@ -793,6 +793,82 @@ def LCF(target, basis, subset_size, eps=1e-16, lambda1=10, lambda2=1e8, verbose=
         return best_subset_indices[0], subset, scales, coeffs_hat, best_scores[0]
 
 
+def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size, figsize=(3.5, 0.7),
+                      real_indices=None, real_coeffs=None, flag=True, show_avg=True, height=0.5,
+                      labels=None, lind_thresh=3, unq_thresh=0.96, wspace=0.2, hspace=0.7):
+    N = len(basis)
+    if labels == None:
+        labels = ['$R_{' + f'{N - c}' + '}$' for c in range(N)]
+    n_targets = len(targets)
+
+    if show_avg:
+        ncols = top_n + 1
+    else:
+        ncols = top_n
+    fig, axes_list = plt.subplots(figsize=(figsize[0] * (top_n + 1), figsize[1] * N * n_targets),
+                                  ncols=ncols, nrows=n_targets)
+    plt.subplots_adjust(wspace=wspace, hspace=hspace)
+
+    for i in range(n_targets):    
+        axes = axes_list[i]
+        top_picks = Results[i]
+
+        best_coeffs = top_picks[1][keys[3]][0]
+        best_subset = top_picks[1][keys[1]]
+        best_sorted_coeffs, best_sorted_subset = sort_by_x(best_coeffs, best_subset)
+
+        best_contribs = np.array([best_sorted_coeffs[j] * best_sorted_subset[j]
+                                  for j in range(subset_size)])
+
+        for j, ax in enumerate(axes):
+            format_bar_axes(ax, N, labels)
+
+        for j in range(top_n):
+            indices = top_picks[j + 1][keys[0]]
+            subset = top_picks[j + 1][keys[1]]
+            coeffs = top_picks[j + 1][keys[3]][0]
+            score = top_picks[j + 1][keys[4]]
+
+            if flag:
+                xlabel = '$R^2 = ' + f'{1 - score:.4f}$'
+                text_colors = ['k' for k in range(subset_size)]       
+                unq = get_uniqueness_cost(coeffs, subset, best_contribs, subset_size)
+                unq_label = f'\nUQS = {unq:.4f}'
+                if unq < unq_thresh:
+                    text_colors[1] = plt.cm.tab10(3)
+                elif unq > .999999:
+                    text_colors[1] = plt.cm.tab10(0)
+                #lind = 1 - np.max([r2_score(ri, rj) for ri, rj in itertools.combinations(subset, 2)])
+                combos = np.array([[ri, rj] for ri, rj in itertools.combinations(subset, 2)])
+                lind = -r2_score(combos[:, 1, :], combos[:, 0, :], multioutput='variance_weighted')
+                lind_label = f'\nLIS = {lind:.4f}'
+                if lind < lind_thresh:
+                    text_colors[2] = plt.cm.tab10(3)
+                add_multicolored_xlabel(axes[j], [xlabel, unq_label, lind_label], text_colors)
+            
+            for k, tick in enumerate(axes[j].yaxis.get_ticklabels()):
+                if k in N - 1 - indices:
+                    tick.set_color(colors[i]) 
+
+            if show_avg:
+                idx_list = [j, top_n]
+            else:
+                idx_list = [j]
+            for idx in idx_list:
+                if idx == j:
+                    alpha = 1
+                else:
+                    alpha = 0.15
+                axes[idx].barh(N - 1 - indices, coeffs, height=height,
+                               color=colors[i], alpha=alpha, zorder=2)
+                if real_indices != None and real_coeffs != None:
+                    axes[idx].barh(N - 1 - np.array(real_indices[i]), real_coeffs[i], height=height,
+                                   edgecolor='k', fill=False, linewidth=1.5, linestyle='--', zorder=2)
+        if show_avg:
+            axes[top_n].set_xlabel('Avg. Contribs.', fontsize=16)
+    return fig, axes_list
+
+
 def format_bar_axes(ax, n, labels):
     ax.tick_params(labelsize=14, width=2, length=4)
     ax.set_yticks(np.arange(n))
@@ -833,16 +909,13 @@ def get_uniqueness_cost(coeffs, subset, best_contribs, subset_size):
 def label_ax_with_score(ax, target, pred, sub_idxs, conc, flag=False):
     R = R_score(target, pred)
     chi2 = chi_square(target, pred)
-    xs = ax.get_xlim()
-    ys = ax.get_ylim()
     label = '$C_{max} = ' + f'{sub_idxs}' + '_{(' + f'{int(conc * 100)}' + '\%)}$\n' \
             + '$\chi^2 = $' + f'{chi2:.03f}'
     if flag:
         c = 'red'
     else:
         c = 'k'
-    ax.text(0.36 * (xs[1] - xs[0]) + xs[0], 0.12 * (ys[1] - ys[0]) + ys[0], label, 
-            fontsize=16, color=c)
+    ax.text(0.4, 0.3, label, transform=ax.transAxes, fontsize=16, color=c)
 
    
 def plot_recon_grid(energy, targets, subset_indices, subsets, scales, coeffs, Ref_Data_dict,
@@ -871,6 +944,8 @@ def plot_recon_grid(energy, targets, subset_indices, subsets, scales, coeffs, Re
                             c=plt.cm.tab10(7))
                     ax.plot(energy, preds[i * ncols + j], '--', linewidth=3, label='fit',
                             c=plt.cm.tab10(c))
+                    ax.plot(energy, targets[i * ncols + j] - preds[i * ncols + j], '-',
+                            linewidth=2, label='difference', c='k')
                     max_i = subset_indices[i * ncols + j][np.argmax(coeffs[i * ncols + j])]
                     max_conc = np.max(coeffs[i * ncols + j])
                     if (max_i != i * ncols + j or max_conc < confidence) and flag_identity:
@@ -1193,3 +1268,61 @@ def plot_RFE_cv_scores(plot, Scores, base_estimator, n_estimators, N,
     ax.set_ylabel(ylabel, fontsize=18)
     ax.tick_params(width=1.5, length=8, direction='out', labelsize=16)
     ax.set_title(title, fontsize=18)
+
+
+def find_diversity(avg_spectra, dbscan_clustering, normalized_spectra):
+    total_avg = np.average(avg_spectra, axis=0)
+    diversity = np.sum((avg_spectra - total_avg)**2) / np.sum(total_avg)
+    print("Diversity of UMAP clusters:")
+    print(diversity)
+
+    cluster_sizes = []
+    for label in np.unique(dbscan_clustering.labels_):
+        count = np.sum([1 for l in dbscan_clustering.labels_ if l == label])
+        cluster_sizes.append(count)
+    cluster_sizes = np.array(cluster_sizes)
+
+    random_diversities = []
+    for k in range(100):
+        print(k, end='\r')
+        Is = []
+        indices = list(np.arange(np.sum(cluster_sizes)))
+        for cluster in cluster_sizes:
+            selection = np.random.choice(indices, size=cluster, replace=False)
+            Is.append(selection)
+            indices = [i for i in indices if i not in selection]
+
+        cluster_avgs_random = []
+        for j, label in enumerate(np.unique(dbscan_clustering.labels_)):
+            spectra = np.array([normalized_spectra[i] for i in Is[j]])
+            cluster_avgs_random.append(np.average(spectra, axis=0))
+        cluster_avgs_random = np.array(cluster_avgs_random)
+
+        total_avg_random = np.average(cluster_avgs_random, axis=0)
+        diversity_random = np.sum((cluster_avgs_random - total_avg_random)**2) / np.sum(total_avg_random)
+        random_diversities.append(diversity_random)
+    random_diversities = np.array(random_diversities)
+
+    print("\nDiversity of random clusters:")
+    xbar = np.average(random_diversities)
+    s = np.std(random_diversities)
+    print(f'{xbar} +/- {s}')  # sample mean and std
+
+    """
+    H0: Diversity from UMAP is not statistically significant compared to random groupings.
+
+    H1: Diversity from UMAP is statistically significant compared to random groupings.
+
+    We will be doing a z test with significance (alpha) = 0.01
+    """
+
+    z = (diversity - xbar) / s
+    pval = norm.sf(z)
+    print(f"p-val = {pval}")
+    alpha = 0.01
+    if pval < alpha:
+        print("We reject the null hypothesis, so the diversity of the UMAP clusters is statisitcally significant.")
+    else:
+        print("We cannot reject the null hypothesis, so the diversity of the UMAP clusters " +
+              "is not statisitcally significant.")
+    return diversity, xbar, s
