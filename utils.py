@@ -23,10 +23,26 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.manifold import TSNE
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
-
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans
+
+from scipy.interpolate import interp1d
+from scipy.stats import wasserstein_distance, pearsonr
+
+import sympy
+
+from sklearn.model_selection import cross_val_score, RepeatedKFold
+from sklearn.linear_model import MultiTaskElasticNetCV
+
+from joblib import dump, load
+
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib import gridspec
+import matplotlib as mpl
 
 import umap
+from sklearn.manifold import TSNE
 
 
 def parse_tiff(filename):
@@ -515,7 +531,8 @@ def show_PCs(energy, pca, n=4):
     axes[0].plot(energy, pca.mean_, linewidth=4.5, label='mean', c=plt.cm.tab10(7))
 
     for i, pc in enumerate(pca.components_):
-        axes[1].plot(energy, pc, linewidth=4.5, alpha=0.6, label=f"$PC_{i + 1}$")
+        axes[1].plot(energy, pc, linewidth=3.5, alpha=0.6, label=f"$PC_{i + 1}$",
+                     c=plt.cm.Dark2(i + 1))
         if i + 1 == n:
             break
 
@@ -527,11 +544,11 @@ def show_PCs(energy, pca, n=4):
         ax.set_xlabel('Energy (eV)', fontsize=16)
 
 
-def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=True,
+def get_translated_colors(clustering, spectra_dict, map_colors=True,
                           translation=1):
-    points = list(filtered_spectra_dict.keys())
+    points = list(spectra_dict.keys())
     point_index = {point: i for i, point in enumerate(points)}
-    labels = dbscan_clustering.labels_.copy()
+    labels = clustering.labels_.copy()
     
     color_codemap = {i: i for i in range(len(np.unique(labels)))}
     if map_colors:
@@ -547,15 +564,21 @@ def get_translated_colors(dbscan_clustering, filtered_spectra_dict, map_colors=T
         elif translation == 4:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
                                (74, 46): 12, (73, 65): 7, (60, 124): 0}
+        elif translation == 5:
+            translation_map = {(59, 49): 13, (126, 114): 19, (18, 36): 6,
+                               (47, 69): 7, (74, 46): 12, (26, 26): 3}                   
+        else:
+            translation_map = None
     else:
-        translation_map = {}
+        translation_map = None
     
-    for i, point in enumerate(points):
-        if point in list(translation_map.keys()):
-            translated_color = translation_map[point]
-            original_label = labels[point_index[point]]
-            print(f'{original_label} -> {translated_color}')
-            color_codemap[original_label] = translated_color
+    if translation_map != None:
+        for i, point in enumerate(points):
+            if point in list(translation_map.keys()):
+                translated_color = translation_map[point]
+                original_label = labels[point_index[point]]
+                print(f'{original_label} -> {translated_color}')
+                color_codemap[original_label] = translated_color
             
     translated_colors = [color_codemap[label] for label in labels]
     return translated_colors, color_codemap
@@ -797,7 +820,7 @@ def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size,
                       real_indices=None, real_coeffs=None, flag=True, show_avg=True, height=0.5,
                       labels=None, lind_thresh=3, unq_thresh=0.96, wspace=0.2, hspace=0.7):
     N = len(basis)
-    if labels == None:
+    if labels is None:
         labels = ['$R_{' + f'{N - c}' + '}$' for c in range(N)]
     n_targets = len(targets)
 
@@ -805,8 +828,11 @@ def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size,
         ncols = top_n + 1
     else:
         ncols = top_n
+    
     fig, axes_list = plt.subplots(figsize=(figsize[0] * (top_n + 1), figsize[1] * N * n_targets),
                                   ncols=ncols, nrows=n_targets)
+    if n_targets == 1:
+        axes_list = [axes_list]
     plt.subplots_adjust(wspace=wspace, hspace=hspace)
 
     for i in range(n_targets):    
@@ -1326,3 +1352,60 @@ def find_diversity(avg_spectra, dbscan_clustering, normalized_spectra):
         print("We cannot reject the null hypothesis, so the diversity of the UMAP clusters " +
               "is not statisitcally significant.")
     return diversity, xbar, s
+
+
+def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', clustering='K-means',
+                               translation=1, eps=1, perplexity=50, n_neighbors=80, n_clusters=4,
+                               early_exaggeration=12, data_description='full_spectra', verbose=False):
+    """Dimension reduction and clustering in 2D with different clustering and dim. red. methods."""
+    pca = PCA(n_components=6)
+    pca_components = pca.fit_transform(data)
+    
+    if method == 'PCA':
+        reduced_space = pca_components
+    elif method =='UMAP':
+        reducer = umap.UMAP(random_state=42, n_components=2,
+                            n_neighbors=n_neighbors, min_dist=0)
+        reduced_space = reducer.fit_transform(pca_components)
+    elif method == 't-SNE':
+        reducer = TSNE(n_components=2, perplexity=perplexity,
+                       early_exaggeration=early_exaggeration, random_state=42)
+        reduced_space = reducer.fit_transform(pca_components)
+       
+    if clustering == 'K-means':
+        clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
+    elif clustering == 'dbscan':
+        clusterizer = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
+    
+    cluster_dict = {loc: clusterizer.labels_[i] for i, loc in enumerate(list(data_dict.keys()))}
+    color_labels, codemap = get_translated_colors(clusterizer, data_dict, map_colors=True,
+                                                  translation=translation)
+    colors = [plt.cm.tab20(c) for c in color_labels]
+
+    fig, axes = plt.subplots(figsize=(13, 4), ncols=3)
+    plt.subplots_adjust(wspace=0.1)
+
+    ax = axes[0]
+    ax.scatter(reduced_space[:, 0], reduced_space[:, 1], marker='o', s=25, color=colors,
+               edgecolor='w', linewidth=0.3)
+
+    if method == 'PCA':
+        axis_label = 'PC'
+    else:
+        axis_label = method
+    
+    ax.set_ylabel(f'${axis_label}_1$', fontsize=20)
+    ax.set_xlabel(f'${axis_label}_2$', fontsize=20)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(f'{clustering} clustering', fontsize=19)
+
+    plot_color_code_map((fig, axes[1]), data_dict, color_labels)
+    axes[1].set_title('XANES map', fontsize=18)
+
+    plot_expected_results(expected_results, axes[2])
+    axes[2].set_title('Expected results', fontsize=18)
+    plt.savefig(f'Figures/{method}_{clustering}_{data_description}.png', dpi=600, bbox_inches='tight')
+
+    if verbose:
+        return cluster_dict, codemap
