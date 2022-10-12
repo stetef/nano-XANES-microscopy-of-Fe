@@ -363,7 +363,7 @@ def normalize_spectra(energy, spectra_list, spectra_dict,
 
 
 def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
-                       plot=True, pre_edge_offset=10):
+                       plot=True, pre_edge_offset=10, colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
     if plot:
         fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
         plt.subplots_adjust(wspace=0.2, hspace=0)
@@ -381,10 +381,10 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
 
         if plot:
             ax = axes[i, 0]
-            ax.plot(energy, spectrum)
+            ax.plot(energy, spectrum, color=colors[0])
             ax.plot(energy[whiteline], spectrum[whiteline],
                     's', c='k', markersize=10, fillstyle='none')
-            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=plt.cm.tab10(1))
+            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=colors[1])
             ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)
             if pre_edge_offset == 'none':
                 ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
@@ -392,7 +392,7 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
                 ax.plot(energy, y_fit_pre, 'k--', linewidth=1)
 
             ax = axes[i, 1]
-            ax.plot(energy, y_norm)
+            ax.plot(energy, y_norm, color=colors[0])
 
             for ax in axes[i]:
                 ax.set_xlabel('Energy (eV)', fontsize=16)

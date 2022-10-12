@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="196.19167mm"
+   width="283.50415mm"
    height="87.712502mm"
-   viewBox="0 0 196.19166 87.712502"
+   viewBox="0 0 283.50414 87.712502"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -194,23 +194,23 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="359.12099"
-     inkscape:cy="221.80606"
+     inkscape:zoom="1"
+     inkscape:cx="546.15569"
+     inkscape:cy="172.44629"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="true"
      inkscape:window-width="1920"
      inkscape:window-height="986"
-     inkscape:window-x="-11"
+     inkscape:window-x="2149"
      inkscape:window-y="-11"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid927"
-       originx="-2.4458332"
-       originy="-5.0916668" />
+       originx="-2.4458334"
+       originy="-5.0916669" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -228,20 +228,20 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-2.4458333,-5.0916665)">
+     transform="translate(-2.4458335,-5.0916665)">
     <rect
        style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.378755;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1044"
-       width="191.88907"
-       height="20.372923"
-       x="5.2255206"
-       y="69.585411"
+       width="279.13544"
+       height="19.843746"
+       x="5.291667"
+       y="70.114586"
        ry="0"
        rx="0" />
     <rect
        style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.482534;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1915"
-       width="191.82292"
+       width="279.13541"
        height="31.75"
        x="5.2916665"
        y="15.875"
@@ -261,14 +261,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;fill:#000000;stroke-width:0.264583"
-       x="133.76605"
+       x="116.30365"
        y="12.788451"
        id="text839"><tspan
          sodipodi:role="line"
          id="tspan837"
-         x="133.76605"
+         x="116.30365"
          y="12.788451"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:0.264583">Our Pipeline</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:0.264583">Jahrman, et al. Pipeline</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
@@ -292,7 +292,7 @@
          x="105.23381"
          y="25.655012"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan851">1. Validate (&amp; filter) references</tspan></text>
+         id="tspan851">1. Choose references ad hoc</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
@@ -323,14 +323,12 @@
          x="106.18709"
          y="56.678005"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan897">2. LASSO regression for</tspan><tspan
+         id="tspan895">2. LASSO regression for 1 fit</tspan><tspan
          sodipodi:role="line"
          x="106.18709"
          y="64.615501"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan895">    only N choose k<tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;baseline-shift:sub"
-   id="tspan1826">max </tspan>fits</tspan><tspan
+         id="tspan940">    (no enumeration)</tspan><tspan
          sodipodi:role="line"
          x="106.18709"
          y="72.553001"
@@ -359,33 +357,33 @@
        y="77.586777"
        id="text921"><tspan
          sodipodi:role="line"
-         id="tspan919"
          x="106.187"
          y="77.586777"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583">3. Flag uncertain solutions</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan925">3. Select best solution using</tspan><tspan
          sodipodi:role="line"
          x="106.187"
          y="85.524277"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan925">    using validation in Step 1.</tspan></text>
+         id="tspan944">    R-value exclusively</tspan></text>
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 5.2916666,15.875 H 197.11458"
+       d="m 5.2916666,15.875 279.1354134,0"
        id="path929"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 5.2916666,47.625 H 197.11458"
+       d="m 5.2916666,47.625 279.1354134,0"
        id="path931"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 5.2916666,69.585413 H 197.11458"
+       d="m 5.2916668,70.114583 279.1354132,0"
        id="path933"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 5.2916666,89.958333 H 197.11458"
+       d="m 5.2916666,89.958333 279.1354134,0"
        id="path935"
        sodipodi:nodetypes="cc" />
     <text
@@ -397,29 +395,95 @@
        d="M 100.54167,7.9374998 V 89.958333"
        id="path1066"
        sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 193.14583,7.9374996 V 89.958333"
+       id="path936"
+       sodipodi:nodetypes="cc" />
     <rect
        style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;paint-order:markers fill stroke"
        id="rect1781"
        width="138.12651"
        height="14.86167"
-       x="31.75"
+       x="79.375046"
        y="29.104166"
        ry="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583"
-       x="100.6031"
+       x="148.22781"
        y="34.891968"
        id="text855"><tspan
          sodipodi:role="line"
          id="tspan853"
-         x="100.6031"
+         x="148.22781"
          y="34.891968"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583">Which references are pysically meaningful?</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583">Which references are physically meaningful?</tspan><tspan
          sodipodi:role="line"
-         x="100.6031"
+         x="148.22781"
          y="42.829468"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583"
          id="tspan859">Which ones will be sufficient versus necessary?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;fill:#000000;stroke-width:0.264583"
+       x="223.32755"
+       y="12.788605"
+       id="text912"><tspan
+         sodipodi:role="line"
+         id="tspan910"
+         x="223.32755"
+         y="12.788605"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:0.264583">Our Pipeline</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+       x="197.97026"
+       y="25.655107"
+       id="text916"><tspan
+         sodipodi:role="line"
+         x="197.97026"
+         y="25.655107"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan914">1. Validate (&amp; filter) references</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+       x="198.92354"
+       y="56.678108"
+       id="text926"><tspan
+         sodipodi:role="line"
+         x="198.92354"
+         y="56.678108"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan918">2. LASSO regression for</tspan><tspan
+         sodipodi:role="line"
+         x="198.92354"
+         y="64.615608"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan922">    N choose k<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;baseline-shift:sub"
+   id="tspan920">max </tspan>fits</tspan><tspan
+         sodipodi:role="line"
+         x="198.92354"
+         y="72.553108"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan924" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+       x="198.92345"
+       y="77.586601"
+       id="text932"><tspan
+         sodipodi:role="line"
+         id="tspan928"
+         x="198.92345"
+         y="77.586601"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583">3. Flag uncertain solutions</tspan><tspan
+         sodipodi:role="line"
+         x="198.92345"
+         y="85.524101"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan930">    using validation in Step 1</tspan></text>
   </g>
 </svg>
