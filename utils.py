@@ -33,6 +33,9 @@ import sympy
 
 from sklearn.model_selection import cross_val_score, RepeatedKFold
 from sklearn.linear_model import MultiTaskElasticNetCV
+from scipy.optimize import nnls
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import ElasticNetCV
 
 from joblib import dump, load
 
@@ -102,9 +105,14 @@ def add_point_label(pickable, data, ax):
 
 
 def get_filtered_img(data, threshold=0.05, return_mask=False):
-    mask = np.zeros((data.shape[0], data.shape[1], data.shape[2]))
-    bool_arr = np.max(data, axis=0) < threshold
-    mask[:, bool_arr] = 1
+    d = len(data.shape)
+    mask = np.zeros([data.shape[i] for i in range(d)])
+    if d == 3:
+        bool_arr = np.max(data, axis=0) < threshold
+        mask[:, bool_arr] = 1
+    else:
+        bool_arr = data < threshold
+        mask[bool_arr] = 1
     filtered_img = np.ma.array(data, mask=mask)
     if return_mask:
         return filtered_img, mask
@@ -140,9 +148,14 @@ def get_similarity_mtx(data, metric='cosine similarity'):
 
 
 def plot_corr_matx(ax, Similarity_matrix, data_columns, metric, rot=90,
-                   threshold=None, std=None):
-    img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
-                    interpolation='nearest', origin='lower')
+                   threshold=None, std=None, vmin=None, vmax=None):
+    if vmin is not None and vmax is not None:
+        img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
+                        interpolation='nearest', origin='lower',
+                        vmin=vmin, vmax=vmax)
+    else:
+        img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
+                        interpolation='nearest', origin='lower')
     ax.tick_params(direction='out', width=2, length=6, labelsize=14)
     if metric == 'cosine similarity':
         metric = 'cos. sim. \n$ \equiv \\frac{ \sum \; y_i \; \hat{y}_i }' +\
@@ -209,19 +222,18 @@ def get_least_squares_scores(data, Refs):
     return np.array(scores)
 
     
-def plot_MSE_hist(ax, tmp_X, Refs, bins=25,
+def plot_MSE_hist(ax, tmp_X, Refs, bins=25, scale=0.06,
                   colors=[plt.cm.tab20b(17), plt.cm.tab20b(13)]):
     exp_scores = get_least_squares_scores(tmp_X, Refs)
 
-    kwargs = {'N': len(exp_scores), 'scale': 0.02, 'dropout': 0.85}
+    kwargs = {'N': len(exp_scores), 'scale': scale, 'dropout': 0.85}
     x_data, coeffs = generate_linear_combos(Refs, **kwargs)
 
     fab_scores = get_least_squares_scores(x_data, Refs)
 
-    labels = ['Experimental\ndata', 'True linear\ncombinations\n(2% noise)']
-    ax.hist([exp_scores, fab_scores], bins=bins, density=True, edgecolor='w',
-            color=colors, label=labels)
-    ax.set_xlim(0.00005, 0.00085)
+    labels = ['Exp. data', f'Ref. lin. comb.\n$\sigma^2={scale}*I(E)$']
+    ax.hist([exp_scores, fab_scores], bins=bins, density=True,
+            color=colors, label=labels, rwidth=1)
     ax.tick_params(direction='out', width=2, length=6, labelsize=13)
     ax.set_xlabel('MSE of Least Squares Solution', fontsize=16)
     ax.set_yticks([])
@@ -307,16 +319,17 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17,
     return n_components
 
 
-def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=10,
-                       whiteline=None, y_fit_pre=None, y_fit_post=None):
+def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
+                       post_edge_offset=10, whiteline=None, y_fit_pre=None,
+                       y_fit_post=None):
     if whiteline is None:
         whiteline = np.argmax(np.gradient(spectrum))
 
     if y_fit_post is None:
-        e_post = energy[whiteline:].reshape(-1, 1)
-        y_post = spectrum[whiteline:].reshape(-1, 1)
-        
+        e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
+        y_post = spectrum[whiteline + post_edge_offset:].reshape(-1, 1)
         reg_post = LinearRegression().fit(e_post, y_post)
+
         post_edge = energy[whiteline:].reshape(-1, 1)
         y_fit_post = reg_post.predict(post_edge)
 
@@ -347,13 +360,14 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=10,
         return y_norm
 
 
-def normalize_spectra(energy, spectra_list, spectra_dict,
-                      pre_edge_offset=10):
+def normalize_spectra(energy, spectra_list, spectra_dict, 
+                      pre_edge_offset=20, post_edge_offset=10):
     normalized_spectra = []
     for spectrum in spectra_list:
-        y_norm = normalize_spectrum(energy, spectrum,
-                                    pre_edge_offset=pre_edge_offset)
+        y_norm = normalize_spectrum(energy, spectrum, pre_edge_offset=pre_edge_offset,
+                                    post_edge_offset=pre_edge_offset)
         normalized_spectra.append(y_norm)
+    normalized_spectra = np.array(normalized_spectra)
 
     normalized_spectra_dict = {}
     for i, key in enumerate(list(spectra_dict.keys())):
@@ -362,8 +376,9 @@ def normalize_spectra(energy, spectra_list, spectra_dict,
     return normalized_spectra, normalized_spectra_dict
 
 
-def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
-                       plot=True, pre_edge_offset=10, colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
+def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=False,
+                       plot=True, pre_edge_offset=20, post_edge_offset=10,
+                       colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
     if plot:
         fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
         plt.subplots_adjust(wspace=0.2, hspace=0)
@@ -371,21 +386,33 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
     pre_edge_fits = []
     post_edge_fits = []
     whitelines = []
+    y_norms = []
     for i, spectrum in enumerate(filtered_spectra[start_i:]):
+        if type(pre_edge_offset) is list:
+            pre = pre_edge_offset[i]
+        else:
+            pre = pre_edge_offset
+        if type(post_edge_offset) is list:
+            post = int(post_edge_offset[i])
+        else:
+            post = post_edge_offset
         whiteline, y_fit_pre, y_fit_post, y_norm = normalize_spectrum(energy, spectrum,
-                                                                      pre_edge_offset=pre_edge_offset,
+                                                                      pre_edge_offset=pre,
+                                                                      post_edge_offset=post,
                                                                       verbose=True)
         pre_edge_fits.append(y_fit_pre)
         post_edge_fits.append(y_fit_post)
         whitelines.append(whiteline)
+        y_norms.append(y_norm)
 
         if plot:
             ax = axes[i, 0]
-            ax.plot(energy, spectrum, color=colors[0])
+            ax.plot(energy, spectrum, color=colors[0])  # raw spectrum
             ax.plot(energy[whiteline], spectrum[whiteline],
-                    's', c='k', markersize=10, fillstyle='none')
-            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=colors[1])
-            ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)
+                    's', c='k', markersize=10, fillstyle='none')  # whiteline
+            ax.plot(energy[whiteline + post_edge_offset:],  # post highlight
+                    spectrum[whiteline + post_edge_offset:], '-', c=colors[1])
+            ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)  # fit line
             if pre_edge_offset == 'none':
                 ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
             else:
@@ -413,67 +440,6 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=
     elif plot:
         return fig, axes
 
-"""
-def normalize_spectrum(energy, spectrum, verbose=False):
-    whiteline = np.argmax(np.gradient(spectrum))
-    
-    e_subset = energy[whiteline:].reshape(-1, 1)
-    y_subset = spectrum[whiteline:].reshape(-1, 1)
-    
-    reg = LinearRegression().fit(e_subset, y_subset)
-    post_edge = energy[whiteline:].reshape(-1, 1)
-    y_fit = reg.predict(post_edge)
-    
-    y_norm = spectrum.copy()
-    line = y_fit.reshape(-1)
-    y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
-    y_norm = y_norm / line[0]
-    
-    if verbose:
-        return whiteline, y_fit.reshape(-1), y_norm, reg
-    else:
-        return y_norm
-"""
-
-"""
-def show_normalization(energy, filtered_spectra, N=5, start_i=50, return_params=False,
-                       plot=True):
-    if plot:
-        fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
-        plt.subplots_adjust(wspace=0.2, hspace=0)
-
-    coeffs = []
-    intercepts = []
-    whitelines = []
-    for i, spectrum in enumerate(filtered_spectra[start_i:]):
-        whiteline, y_fit, y_norm, regressor = normalize_spectrum(energy, spectrum,
-                                                                 verbose=True)
-        coeffs.append(regressor.coef_[0][0])
-        intercepts.append(regressor.intercept_[0])
-        whitelines.append(whiteline)
-
-        if plot:
-            ax = axes[i, 0]
-            ax.plot(energy, spectrum)
-            ax.plot(energy[whiteline], spectrum[whiteline],
-                    's', c='k', markersize=10, fillstyle='none')
-            ax.plot(energy[whiteline:], spectrum[whiteline:], '-', c=plt.cm.tab10(1))
-            ax.plot(energy[whiteline:], y_fit, 'k-', linewidth=1)
-
-            ax = axes[i, 1]
-            ax.plot(energy, y_norm)
-
-            for ax in axes[i]:
-                ax.set_xticks([])
-                ax.tick_params(direction='in', width=2, length=6, labelsize=14)
-                ax.grid()
-
-        if i == N - 1:
-            break
-            
-    if return_params:
-        return np.array(coeffs), np.array(intercepts), np.array(whitelines)
-"""
 
 def make_PCA_triangle_plot(data, n_components, cmap=plt.cm.gnuplot,
                            c=plt.cm.tab20b(17), bins=23):
@@ -554,10 +520,10 @@ def get_translated_colors(clustering, spectra_dict, map_colors=True,
     if map_colors:
         if translation == 1:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
-                               (47, 69): 12}
+                               (47, 69): 12, (16, 39): 7}
         elif translation == 2:
             translation_map = {(59, 49): 13, (64, 128): 6, (126, 114): 19,
-                               (47, 69): 12, (74, 46): 7}
+                               (47, 69): 12}
         elif translation == 3:
             translation_map = {(59, 49): 13, (126, 114): 19,
                                (47, 69): 7, (74, 46): 12}
@@ -713,34 +679,43 @@ def R_score(data, fit):
 
 
 def scale_coeffs_to_add_to_one(coeff_mtx):
+    coeff_mtx = np.array([[c if c > 0 else 0 for c in coeff] for coeff in coeff_mtx])
     sums = [np.sum(coeffs) for coeffs in coeff_mtx]
     normalized_coeffs = np.array([coeff_mtx[i] / sums[i] for i in range(len(sums))])
     return normalized_coeffs
 
 
-def objective_function(x, Refs, target, lambda1, lambda2):
-    scale = x[0]
-    coeffs = x[1:]
-    calc = Refs.T @ coeffs * scale
-    calc = calc - np.min(calc)  # set min to zero
-    return np.sum((calc - target)**2) \
+def objective_function(x, basis, target, lambda1, lambda2):
+    coeffs = x
+    calc = basis.T @ coeffs
+    calc = calc.reshape(-1)
+    return 0.5 * np.sum((calc - target)**2) \
            + lambda1 * np.sum(np.abs(coeffs)) \
            + lambda2 * (np.sum(coeffs) - 1)**2
 
 
-def get_coeffs_from_spectra(spectra, Refs, lambda1=10, lambda2=1e8):
-    m = Refs.shape[0]
-    coeffs_0 = np.ones(m + 1) / (m + 1)
-    bounds = np.zeros((m + 1, 2))
-    bounds[:, 1] = 1
-    bounds[0, 1] = 20
-    results = [minimize(objective_function, coeffs_0,
-               args=(Refs, spectrum, lambda1, lambda2),
-               bounds=bounds) for spectrum in spectra]
-    compiled_results = np.array([results[i].x for i in range(len(results))])
-    coeffs = compiled_results[:, 1:]
-    scales = compiled_results[:, 0]
-    return scales, scale_coeffs_to_add_to_one(coeffs)
+def get_coeffs_from_spectra(spectra, basis, lambda1=0.0006, lambda2=10, alpha=0.0006,
+                            method='custom'):
+    if method != 'lasso':
+        m = basis.shape[0]
+        coeffs_0 = np.ones((m)) / m  # uniform prior
+        bounds = np.zeros((m, 2))
+        bounds[:, 1] = 1
+        results = [minimize(objective_function, coeffs_0,
+                   args=(basis, target, lambda1, lambda2),
+                   bounds=bounds, method='SLSQP') for target in spectra]
+        coeffs = np.array([results[i]['x'] for i in range(len(results))])
+        for r in results:
+            if r['success'] == False:
+                print('Did not converge.')
+        coeffs = coeffs #scale_coeffs_to_add_to_one(coeffs)
+    else:
+        coeffs = []
+        for target in spectra:
+            lasso = Lasso(alpha=0.0005, max_iter=5000, positive=True)
+            lasso.fit(basis.T, target)
+            coeffs.append(lasso.coef_)
+    return coeffs
 
 
 def get_sets_from_subset_indices(subset_indices, basis):
@@ -751,9 +726,9 @@ def get_sets_from_subset_indices(subset_indices, basis):
 
 
 def get_goodness_of_fit_from_subset(subset, target, lambda1=10, lambda2=1e8):
-    scales, coeffs_hat = get_coeffs_from_spectra([target], subset,
-                                                 lambda1=lambda1, lambda2=lambda2)
-    recon = coeffs_hat @ subset * scales
+    coeffs_hat = get_coeffs_from_spectra([target], subset,
+                                         lambda1=lambda1, lambda2=lambda2)
+    recon = coeffs_hat @ subset
     recon = recon.reshape(-1)
     score = 1 - r2_score(target, recon, multioutput='variance_weighted')
     return score
@@ -766,15 +741,15 @@ def sort_by_x(x, y):
     return x, y
 
 
-def get_fit_params_from_indices(indices, basis, target, lambda1=10, lambda2=1e8):
+def get_fit_params_from_indices(indices, basis, target, lambda1=0.0006, lambda2=10):
     subset, _, _ = get_sets_from_subset_indices(indices, basis)
-    scales, coeffs_hat = get_coeffs_from_spectra([target], subset,
-                                                 lambda1=lambda1, lambda2=lambda2)
-    return subset, scales, coeffs_hat
+    coeffs_hat = get_coeffs_from_spectra([target], subset,
+                                         lambda1=lambda1, lambda2=lambda2)
+    return subset, coeffs_hat
 
 
-def LCF(target, basis, subset_size, eps=1e-16, lambda1=10, lambda2=1e8, verbose=False,
-        reps=5):
+def LCF(target, basis, subset_size, eps=1e-16, lambda1=0.0006, lambda2=10, verbose=False,
+        reps=5, print_best=True):
     
     indices = np.arange(basis.shape[0])     
     best_subset_indices = list(np.tile(np.zeros(subset_size), reps).reshape(reps, subset_size))
@@ -807,18 +782,19 @@ def LCF(target, basis, subset_size, eps=1e-16, lambda1=10, lambda2=1e8, verbose=
         
         i += 1      
     
-    print(best_subset_indices[0], best_scores[0])
+    if print_best:
+        print(best_subset_indices[0], best_scores[0])
     if verbose:
         return best_subset_indices, best_scores
     else:
-        subset, scales, coeffs_hat = get_fit_params_from_indices(best_subset_indices[0], basis, target,
-                                                                 lambda1=lambda1, lambda2=lambda2)
-        return best_subset_indices[0], subset, scales, coeffs_hat, best_scores[0]
+        subset, coeffs_hat = get_fit_params_from_indices(best_subset_indices[0], basis, target,
+                                                         lambda1=lambda1, lambda2=lambda2)
+        return best_subset_indices[0], subset, coeffs_hat, best_scores[0]
 
 
 def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size, figsize=(3.5, 0.7),
                       real_indices=None, real_coeffs=None, flag=True, show_avg=True, height=0.5,
-                      labels=None, lind_thresh=3, unq_thresh=0.96, wspace=0.2, hspace=0.7):
+                      labels=None, lind_thresh=0.03, unq_thresh=0.96, wspace=0.2, hspace=0.7):
     N = len(basis)
     if labels is None:
         labels = ['$R_{' + f'{N - c}' + '}$' for c in range(N)]
@@ -829,17 +805,19 @@ def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size,
     else:
         ncols = top_n
     
-    fig, axes_list = plt.subplots(figsize=(figsize[0] * (top_n + 1), figsize[1] * N * n_targets),
+    fig, axes_list = plt.subplots(figsize=(figsize[0] * (top_n + 1),
+                                           figsize[1] * N * n_targets),
                                   ncols=ncols, nrows=n_targets)
+    plt.subplots_adjust(wspace=wspace, hspace=hspace)
+
     if n_targets == 1:
         axes_list = [axes_list]
-    plt.subplots_adjust(wspace=wspace, hspace=hspace)
 
     for i in range(n_targets):    
         axes = axes_list[i]
         top_picks = Results[i]
 
-        best_coeffs = top_picks[1][keys[3]][0]
+        best_coeffs = top_picks[1][keys[2]][0]
         best_subset = top_picks[1][keys[1]]
         best_sorted_coeffs, best_sorted_subset = sort_by_x(best_coeffs, best_subset)
 
@@ -852,21 +830,19 @@ def make_LCF_bar_plot(basis, targets, colors, top_n, Results, keys, subset_size,
         for j in range(top_n):
             indices = top_picks[j + 1][keys[0]]
             subset = top_picks[j + 1][keys[1]]
-            coeffs = top_picks[j + 1][keys[3]][0]
-            score = top_picks[j + 1][keys[4]]
+            coeffs = top_picks[j + 1][keys[2]][0]
+            score = top_picks[j + 1][keys[3]]
 
             if flag:
                 xlabel = '$R^2 = ' + f'{1 - score:.4f}$'
-                text_colors = ['k' for k in range(subset_size)]       
+                text_colors = ['k' for k in range(3)]       
                 unq = get_uniqueness_cost(coeffs, subset, best_contribs, subset_size)
                 unq_label = f'\nUQS = {unq:.4f}'
                 if unq < unq_thresh:
                     text_colors[1] = plt.cm.tab10(3)
-                elif unq > .999999:
+                elif unq > .9999:
                     text_colors[1] = plt.cm.tab10(0)
-                #lind = 1 - np.max([r2_score(ri, rj) for ri, rj in itertools.combinations(subset, 2)])
-                combos = np.array([[ri, rj] for ri, rj in itertools.combinations(subset, 2)])
-                lind = -r2_score(combos[:, 1, :], combos[:, 0, :], multioutput='variance_weighted')
+                lind = 1 - np.max([r2_score(ri, rj) for ri, rj in itertools.combinations(subset, 2)])
                 lind_label = f'\nLIS = {lind:.4f}'
                 if lind < lind_thresh:
                     text_colors[2] = plt.cm.tab10(3)
@@ -935,22 +911,20 @@ def get_uniqueness_cost(coeffs, subset, best_contribs, subset_size):
 def label_ax_with_score(ax, target, pred, sub_idxs, conc, flag=False):
     R = R_score(target, pred)
     chi2 = chi_square(target, pred)
-    label = '$C_{max} = ' + f'{sub_idxs}' + '_{(' + f'{int(conc * 100)}' + '\%)}$\n' \
-            + '$\chi^2 = $' + f'{chi2:.03f}'
+    label = '$C_{max} = ' + f'{sub_idxs}$' + f'\n({int(conc * 100)}%)'
     if flag:
         c = 'red'
     else:
         c = 'k'
-    ax.text(0.4, 0.3, label, transform=ax.transAxes, fontsize=16, color=c)
+    ax.text(0.5, 0.15, label, transform=ax.transAxes, fontsize=16, color=c)
 
    
-def plot_recon_grid(energy, targets, subset_indices, subsets, scales, coeffs, Ref_Data_dict,
+def plot_recon_grid(energy, targets, subset_indices, subsets, coeffs, Ref_Data_dict,
                     confidence=0.8, ncols=5, flag_identity=True, verbose=False, c=3):
     m = len(targets)
     preds = []
     for i in range(m):
-        pred = coeffs[i] @ subsets[i] * scales[i]
-        pred = pred - np.min(pred)
+        pred = coeffs[i] @ subsets[i]
         preds.append(pred.reshape(-1))
     preds = np.array(preds) 
     
@@ -1047,12 +1021,12 @@ def plot_conc_from_subset(plot, coeffs, data_columns, subset_indices, color_code
                 ax.bar_label(rect, labels=names, label_type='center', c='k',
                              fontsize=fontsize, rotation=rot)
             
-    
-    ax.tick_params(direction='out', width=2, length=6, which='major', axis='both')
+    ax.set_yticks(np.arange(10, 100, 10))
+    ax.tick_params(direction='out', width=2, length=6, which='major', axis='both',
+                   labelsize=16)
     ax.set_ylabel('Concentration (%)', fontsize=20)
     ax.set_xticks(np.arange(0, num_refs))
     ax.set_xticklabels(labels, fontsize=18)
-    plt.setp(ax.get_yticklabels(), fontsize=16)
 
 
 def get_coeffs(n, dropout):
@@ -1084,13 +1058,13 @@ def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5):
     Coeffs = []
     for i in range(N):
         coeffs = get_coeffs(n, dropout)
+        x = Refs.T @ coeffs
+        x = x - min(x)
         if scale != 0:
-            noise = np.random.normal(scale=scale,
+            noise = np.random.normal(scale=scale * x,
                                      size=Refs.shape[1])
         else:
             noise = 0
-        x = Refs.T @ coeffs
-        #x = x - np.min(x)
         Data.append(x + noise)
         Coeffs.append(coeffs)
     Data = np.array(Data)
@@ -1376,7 +1350,8 @@ def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', 
         clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
     elif clustering == 'dbscan':
         clusterizer = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
-    
+        print(f"Couldn't cluster {np.sum(clusterizer.labels_ == -1)} points")
+
     cluster_dict = {loc: clusterizer.labels_[i] for i, loc in enumerate(list(data_dict.keys()))}
     color_labels, codemap = get_translated_colors(clusterizer, data_dict, map_colors=True,
                                                   translation=translation)

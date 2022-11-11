@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="283.50415mm"
-   height="87.712502mm"
-   viewBox="0 0 283.50414 87.712502"
+   width="291.84164mm"
+   height="88.112495mm"
+   viewBox="0 0 291.84163 88.112496"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -195,22 +195,22 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="546.15569"
-     inkscape:cy="172.44629"
+     inkscape:cx="498.68313"
+     inkscape:cy="131.1637"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="true"
      inkscape:window-width="1920"
      inkscape:window-height="986"
-     inkscape:window-x="2149"
+     inkscape:window-x="2869"
      inkscape:window-y="-11"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid927"
-       originx="-2.4458334"
-       originy="-5.0916669" />
+       originx="-2.2458337"
+       originy="-4.8916672" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -228,20 +228,20 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-2.4458335,-5.0916665)">
+     transform="translate(-2.245834,-4.8916665)">
     <rect
        style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.378755;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1044"
-       width="279.13544"
+       width="287.07291"
        height="19.843746"
        x="5.291667"
        y="70.114586"
        ry="0"
        rx="0" />
     <rect
-       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.482534;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.489347;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1915"
-       width="279.13541"
+       width="287.07294"
        height="31.75"
        x="5.2916665"
        y="15.875"
@@ -316,21 +316,21 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-       x="106.18709"
+       x="105.43874"
        y="56.678005"
        id="text891"><tspan
          sodipodi:role="line"
-         x="106.18709"
+         x="105.43874"
          y="56.678005"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan895">2. LASSO regression for 1 fit</tspan><tspan
+         id="tspan895">2. LASSO regression: energy to</tspan><tspan
          sodipodi:role="line"
-         x="106.18709"
+         x="105.43874"
          y="64.615501"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan940">    (no enumeration)</tspan><tspan
+         id="tspan940">    coefficients (no enumeration)</tspan><tspan
          sodipodi:role="line"
-         x="106.18709"
+         x="105.43874"
          y="72.553001"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
          id="tspan893" /></text>
@@ -367,23 +367,23 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
          id="tspan944">    R-value exclusively</tspan></text>
     <path
-       style="fill:#000000;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916666,15.875 279.1354134,0"
+       style="fill:#000000;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 5.2916666,15.875 H 292.36458"
        id="path929"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916666,47.625 279.1354134,0"
+       d="m 5.2916666,47.625 287.0729134,-10e-7"
        id="path931"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916668,70.114583 279.1354132,0"
+       d="m 5.2916668,70.114583 287.0729132,0"
        id="path933"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916666,89.958333 279.1354134,0"
+       d="m 5.2916666,89.958333 287.0729134,0"
        id="path935"
        sodipodi:nodetypes="cc" />
     <text
@@ -445,27 +445,25 @@
          x="197.97026"
          y="25.655107"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan914">1. Validate (&amp; filter) references</tspan></text>
+         id="tspan914">1. Validate (&amp; group) references</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-       x="198.92354"
+       x="197.61392"
        y="56.678108"
        id="text926"><tspan
          sodipodi:role="line"
-         x="198.92354"
+         x="197.61392"
          y="56.678108"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan918">2. LASSO regression for</tspan><tspan
+         id="tspan922">2. LASSO regression: reference set</tspan><tspan
          sodipodi:role="line"
-         x="198.92354"
+         x="197.61392"
          y="64.615608"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan922">    N choose k<tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;baseline-shift:sub"
-   id="tspan920">max </tspan>fits</tspan><tspan
+         id="tspan900">     to coefficients (no enumeration)</tspan><tspan
          sodipodi:role="line"
-         x="198.92354"
+         x="197.61392"
          y="72.553108"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
          id="tspan924" /></text>
