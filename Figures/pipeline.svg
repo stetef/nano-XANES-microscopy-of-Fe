@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="291.84164mm"
-   height="88.112495mm"
-   viewBox="0 0 291.84163 88.112496"
+   width="294.1875mm"
+   height="87.8125mm"
+   viewBox="0 0 294.18749 87.812503"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -195,22 +195,22 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="498.68313"
-     inkscape:cy="131.1637"
+     inkscape:cx="564.45794"
+     inkscape:cy="219.93987"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="true"
      inkscape:window-width="1920"
      inkscape:window-height="986"
-     inkscape:window-x="2869"
+     inkscape:window-x="2149"
      inkscape:window-y="-11"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid927"
-       originx="-2.2458337"
-       originy="-4.8916672" />
+       originx="-2.3958337"
+       originy="-5.0416673" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -228,7 +228,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-2.245834,-4.8916665)">
+     transform="translate(-2.3958342,-5.0416665)">
     <rect
        style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.378755;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:45.3543;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1044"
@@ -281,18 +281,24 @@
          y="25.655188"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583">1. Choose references <tspan
    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan845">ad hoc</tspan></tspan></text>
+   id="tspan845"><tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Cambria;-inkscape-font-specification:'Cambria Italic'"
+   id="tspan899">a prior</tspan>i</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
        x="105.23381"
        y="25.655012"
-       id="text849"><tspan
+       id="text849"
+       inkscape:export-xdpi="800"
+       inkscape:export-ydpi="800"><tspan
          sodipodi:role="line"
          x="105.23381"
          y="25.655012"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan851">1. Choose references ad hoc</tspan></text>
+         id="tspan851">1. Choose references <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Cambria;-inkscape-font-specification:'Cambria Italic'"
+   id="tspan901">a priori</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
@@ -378,12 +384,12 @@
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916668,70.114583 287.0729132,0"
+       d="M 5.2916668,70.114583 H 292.36458"
        id="path933"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 5.2916666,89.958333 287.0729134,0"
+       d="M 5.2916666,89.958333 H 292.36458"
        id="path935"
        sodipodi:nodetypes="cc" />
     <text
@@ -392,12 +398,12 @@
        style="font-size:5.64444px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1068);" />
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 100.54167,7.9374998 V 89.958333"
+       d="M 100.54167,7.9374998 V 89.958667"
        id="path1066"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:#000000;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 193.14583,7.9374996 V 89.958333"
+       d="M 193.14583,7.9374996 V 89.958667"
        id="path936"
        sodipodi:nodetypes="cc" />
     <rect
@@ -445,7 +451,17 @@
          x="197.97026"
          y="25.655107"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan914">1. Validate (&amp; group) references</tspan></text>
+         id="tspan914">1. Validate references and filter</tspan><tspan
+         sodipodi:role="line"
+         x="197.97026"
+         y="33.592606"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan931">                via elemental composition</tspan><tspan
+         sodipodi:role="line"
+         x="197.97026"
+         y="41.530106"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
+         id="tspan935">                from X-ray Fluorescence</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
@@ -461,7 +477,7 @@
          x="197.61392"
          y="64.615608"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:Cambria;-inkscape-font-specification:Cambria;stroke-width:0.264583"
-         id="tspan900">     to coefficients (no enumeration)</tspan><tspan
+         id="tspan900">     to coefficients (N enumerations)</tspan><tspan
          sodipodi:role="line"
          x="197.61392"
          y="72.553108"

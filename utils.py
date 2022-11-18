@@ -581,8 +581,9 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
                 ax.imshow(np.log(heatmap.T + 10), extent=extent, origin='lower', aspect='auto',
                           cmap=cmap) 
             else:
-                ax.scatter(reduced_space[:, j], reduced_space[:, i], marker='o', s=15, 
+                ax.scatter(reduced_space[:, i], reduced_space[:, j], marker='o', s=15, 
                            color=colors)
+                ax.text(0.05, 0.8, 'T', fontsize=18, transform=ax.transAxes)
             if j == 0:
                 ax.set_ylabel(f'$x_{i + 1}$', fontsize=20, loc="center", rotation="horizontal")
                 ax.yaxis.set_label_coords(-0.15, 0.37)
