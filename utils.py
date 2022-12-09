@@ -11,6 +11,9 @@ from matplotlib.ticker import MultipleLocator
 import matplotlib.patches as mpatches
 from matplotlib.offsetbox import AnchoredOffsetbox, TextArea
 from matplotlib.offsetbox import HPacker, VPacker, AnnotationBbox
+from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib import gridspec
+
 from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
@@ -39,13 +42,7 @@ from sklearn.linear_model import ElasticNetCV
 
 from joblib import dump, load
 
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, PillowWriter
-from matplotlib import gridspec
-import matplotlib as mpl
-
 import umap
-from sklearn.manifold import TSNE
 
 
 def parse_tiff(filename):
@@ -148,13 +145,14 @@ def get_similarity_mtx(data, metric='cosine similarity'):
 
 
 def plot_corr_matx(ax, Similarity_matrix, data_columns, metric, rot=90,
-                   threshold=None, std=None, vmin=None, vmax=None):
+                   threshold=None, std=None, vmin=None, vmax=None,
+                   cmap=plt.cm.RdPu):
     if vmin is not None and vmax is not None:
         img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
                         interpolation='nearest', origin='lower',
                         vmin=vmin, vmax=vmax)
     else:
-        img = ax.imshow(Similarity_matrix, cmap=plt.cm.RdPu,
+        img = ax.imshow(Similarity_matrix, cmap=cmap,
                         interpolation='nearest', origin='lower')
     ax.tick_params(direction='out', width=2, length=6, labelsize=14)
     if metric == 'cosine similarity':
@@ -243,6 +241,7 @@ def plot_MSE_hist(ax, tmp_X, Refs, bins=25, scale=0.06,
 def plot_expected_results(expected_results, ax):
     labels = ['LFP', 'Pyr', 'SS', 'Hem']
     color_labels = [12, 13, 6, 19]
+    colors = [plt.cm.tab20(c) for c in color_labels]
 
     for i, img in enumerate(expected_results):
         row = i // 2
@@ -263,11 +262,10 @@ def plot_expected_results(expected_results, ax):
         alphas = np.array(list(filtered_img_dict.values()))
         alphas = alphas - np.min(alphas)
         alphas = alphas / np.max(alphas)
-        for j, key in enumerate(list(filtered_img_dict.keys())):
-            x, y = key
-            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=10,
-                    alpha=alphas[j])
-
+        
+        keys = np.array(list(filtered_img_dict.keys()))
+        xs, ys = keys.T
+        ax.scatter(ys, -xs, color=colors[i], s=10, alpha=alphas)
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -321,9 +319,9 @@ def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17,
 
 def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
                        post_edge_offset=10, whiteline=None, y_fit_pre=None,
-                       y_fit_post=None):
+                       y_fit_post=None, whiteline_range=10):
     if whiteline is None:
-        whiteline = np.argmax(np.gradient(spectrum))
+        whiteline = np.argmax(np.gradient(spectrum[:whiteline_range]))
 
     if y_fit_post is None:
         e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
@@ -360,12 +358,13 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
         return y_norm
 
 
-def normalize_spectra(energy, spectra_list, spectra_dict, 
+def normalize_spectra(energy, spectra_list, spectra_dict, whiteline_range=10,
                       pre_edge_offset=20, post_edge_offset=10):
     normalized_spectra = []
-    for spectrum in spectra_list:
+    for i, spectrum in enumerate(spectra_list):
         y_norm = normalize_spectrum(energy, spectrum, pre_edge_offset=pre_edge_offset,
-                                    post_edge_offset=pre_edge_offset)
+                                    post_edge_offset=pre_edge_offset,
+                                    whiteline_range=whiteline_range)
         normalized_spectra.append(y_norm)
     normalized_spectra = np.array(normalized_spectra)
 
@@ -378,7 +377,7 @@ def normalize_spectra(energy, spectra_list, spectra_dict,
 
 def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=False,
                        plot=True, pre_edge_offset=20, post_edge_offset=10,
-                       colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
+                       whiteline_range=10, colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
     if plot:
         fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
         plt.subplots_adjust(wspace=0.2, hspace=0)
@@ -399,6 +398,7 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=F
         whiteline, y_fit_pre, y_fit_post, y_norm = normalize_spectrum(energy, spectrum,
                                                                       pre_edge_offset=pre,
                                                                       post_edge_offset=post,
+                                                                      whiteline_range=whiteline_range,
                                                                       verbose=True)
         pre_edge_fits.append(y_fit_pre)
         post_edge_fits.append(y_fit_post)
@@ -490,15 +490,17 @@ def make_PCA_triangle_plot(data, n_components, cmap=plt.cm.gnuplot,
     return pca, pca_components
 
 
-def show_PCs(energy, pca, n=4):
+def show_PCs(energy, pca, n=4, colors=None, alpha=0.6):
     fig, axes = plt.subplots(figsize=(10, 4), ncols=2)
     plt.subplots_adjust(wspace=0)
+    if colors is None:
+        colors = [plt.cm.Dark2(i + 1) for i in range(n)]
 
     axes[0].plot(energy, pca.mean_, linewidth=4.5, label='mean', c=plt.cm.tab10(7))
 
     for i, pc in enumerate(pca.components_):
-        axes[1].plot(energy, pc, linewidth=3.5, alpha=0.6, label=f"$PC_{i + 1}$",
-                     c=plt.cm.Dark2(i + 1))
+        axes[1].plot(energy, pc, linewidth=3.5, alpha=alpha, label=f"$PC_{i + 1}$",
+                     c=colors[i])
         if i + 1 == n:
             break
 
@@ -596,17 +598,12 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
     return color_labels, codemap, dbscan_clustering
 
 
-def plot_color_code_map(plot, spectra_dict, color_labels, show_cluster='all'):
+def plot_color_code_map(plot, spectra_dict, color_labels):
     fig, ax = plot
-    for i, key in enumerate(list(spectra_dict.keys())):
-        spectrum = spectra_dict[key]
-        x, y = key
-        if show_cluster == 'all':
-            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=4.5)
-        elif show_cluster == color_labels[i]:
-            ax.plot(y, -x, color=plt.cm.tab20(color_labels[i]), marker='.', markersize=10)
-        else:
-            ax.plot(y, -x, color=plt.cm.tab20(15), marker='.', markersize=9, alpha=.3)
+    keys = np.array(list(spectra_dict.keys()))
+    xs, ys = keys.T
+    colors = [plt.cm.tab20(c) for c in color_labels]
+    ax.scatter(ys, -xs, c=colors, s=4.5)
     remove_ticks(ax)
 
 
@@ -1105,45 +1102,36 @@ def histogram_of_importance(plot, x, energy, Refs, bins=50, color=plt.cm.tab20b(
 
 
 def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
-                     leg=True, loc=1, **kwargs):
+                     leg=False, loc=1, **kwargs):
     for i, b in enumerate(basis):
         axes[0].plot(x, b, linewidth=3, color=colors[i], label=f'$x_{i + 1}$')
 
     var = np.std(basis, axis=0)
     axes[0].plot(x, var, color='k', label='var.', linewidth=3)
     if leg:
-        axes[0].legend(fontsize=18, handlelength=0.8, handleheight=1.3,
-                       handletextpad=0.5)
+        axes[2].text(0.97, 0.97, f'n = {best_n}', transform=axes[2].transAxes, fontsize=20,
+                     va='top', ha='right')
 
     data, coeffs = generate_linear_combos(basis, **kwargs)
 
     for d in data:
-        axes[1].plot(x, d, color='gray', alpha=0.1, linewidth=3)
+        axes[1].plot(x, d, color='gray', alpha=0.05, linewidth=3)
 
     var = np.std(data, axis=0)
     axes[1].plot(x, var, color='k', linewidth=2, alpha=0.5)
 
     for ax in axes:
-        ax.tick_params(width=2, length=6, labelsize=15, direction='in')
+        ax.tick_params(width=2, length=6, labelsize=15, direction='out')
     
     labels = np.arange(1, len(indices) + 1)
     label_map = {idx: label for idx, label in zip(indices, labels)}
     
     bins = basis.shape[1]
     n_reps = len(Is)
-    colors = [plt.cm.RdPu( (i + 1) / (n_reps + 1)) for i in range(n_reps)]
+    colors = [plt.cm.Dark2(2) for i in range(n_reps)]
     n, bin_vals, patches = axes[2].hist(Is.T, bins=bins, range=(0, bins), edgecolor='w',
                                         linewidth=0.5, color=colors, stacked=True, alpha=1.)
     axes[2].plot(var / np.max(var) * np.max(n), color='k', linewidth=3)
-    if loc == 1:
-        axes[2].text(0.98, 0.98, f'n = {best_n}', fontsize=22, transform=ax.transAxes,
-                     va='top', ha='right')
-    elif loc == 2:
-        axes[2].text(0.05, 0.98, f'n = {best_n}', fontsize=22, transform=ax.transAxes,
-                     va='top', ha='left')
-    else:
-        axes[2].text(0.4, 0.98, f'n = {best_n}', fontsize=22, transform=ax.transAxes,
-                     va='top', ha='left')
 
     for idx, label in label_map.items():
         height = 0
@@ -1155,16 +1143,19 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
                 ha='center', va='bottom', fontsize=14)
 
 
-def get_RFE_results(base_estimator, x, basis, Ns, reps, n_estimators=1,
+def get_RFE_results(base_estimator, x, basis, Ns, reps,
+                    energy_point_selector, colors, n_estimators=1,
                     plot=False, select_n_for_me=False, verbose=True,
+                    return_axes=False,
                     scoring='neg_root_mean_squared_error', **kwargs):
 
     if plot:
         fig = plt.figure(figsize=(16, 3 * len(Ns)))
         spec = fig.add_gridspec(ncols=3, nrows=len(Ns), width_ratios=[0.5, 0.5, 1.0])
         plt.subplots_adjust(wspace=0.15, hspace=0.2)
-
+    N = kwargs['N']
     Scores = []
+    Axes = []
 
     for row, best_n in enumerate(Ns):
         if select_n_for_me:
@@ -1208,6 +1199,8 @@ def get_RFE_results(base_estimator, x, basis, Ns, reps, n_estimators=1,
 
         if plot:
             axes = [fig.add_subplot(spec[row, j]) for j in range(3)]
+            if return_axes:
+                Axes.append(axes)
 
             if row == 0:
                 axes[0].set_title('Basis set\n& variance (black)', fontsize=20)
@@ -1222,7 +1215,8 @@ def get_RFE_results(base_estimator, x, basis, Ns, reps, n_estimators=1,
 
         indices = []
         if plot:
-            plot_RFE_results(axes, x, basis, indices, Is, best_n, colors, leg=False, **kwargs)
+            plot_RFE_results(axes, x, basis, indices, Is, best_n, colors, leg=True,
+                             **kwargs)
         Scores.append(scores)
 
     model = base_estimator.replace(" ", "_")
@@ -1234,7 +1228,8 @@ def get_RFE_results(base_estimator, x, basis, Ns, reps, n_estimators=1,
         else:
             plt.savefig(f'Figures/test_RFE_results_gaussian_{model}_w_{n_estimators}_dts.png',
                         dpi=600, bbox_inches='tight', transparent=False)
-            
+        if return_axes:
+            return fig, Axes   
     elif verbose: 
         return Scores
 
@@ -1329,13 +1324,13 @@ def find_diversity(avg_spectra, dbscan_clustering, normalized_spectra):
     return diversity, xbar, s
 
 
-def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', clustering='K-means',
+def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', clustering='k-means',
                                translation=1, eps=1, perplexity=50, n_neighbors=80, n_clusters=4,
                                early_exaggeration=12, data_description='full_spectra', verbose=False):
     """Dimension reduction and clustering in 2D with different clustering and dim. red. methods."""
     pca = PCA(n_components=6)
     pca_components = pca.fit_transform(data)
-    
+
     if method == 'PCA':
         reduced_space = pca_components
     elif method =='UMAP':
@@ -1347,7 +1342,7 @@ def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', 
                        early_exaggeration=early_exaggeration, random_state=42)
         reduced_space = reducer.fit_transform(pca_components)
        
-    if clustering == 'K-means':
+    if clustering == 'k-means':
         clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
     elif clustering == 'dbscan':
         clusterizer = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
@@ -1385,3 +1380,49 @@ def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', 
 
     if verbose:
         return cluster_dict, codemap
+
+def plot_true_vs_pred_conc(plot, y_true, y_pred, data_columns, color, nrows=2, ncols=6):
+    N = len(data_columns)
+    MSEs = np.zeros(N)
+    fig, axes = plot
+    for i, j in itertools.product(range(nrows), range(ncols)):
+        if nrows == 1:
+            ax = axes[j]
+        elif ncols == 1:
+            ax = axes[i]
+        else:
+            ax = axes[i, j]
+        idx = i * ncols + j
+        if idx < N:
+            ax.plot([0, 1], [0, 1], '--', c=plt.cm.tab10(7), alpha=0.5, linewidth=2)
+            ax.plot(y_true[:, idx], y_pred[:, idx], 'o', c=color, markersize=5)
+            mse = mean_squared_error(y_true[:, idx], y_pred[:, idx])
+            MSEs[idx] = mse
+            ax.tick_params(labelsize=20, width=2, length=6, direction='out')
+            ax.tick_params(width=0, length=0, direction='out', which='minor')
+            ax.set_xlim(-0.1, 1.1)
+            ax.grid(axis='both', which='both')
+            ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+            ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+            ax.set_xticks([0.1, 0.5, 0.9])
+            if j != 0:
+                ax.set_ylabel(None)
+                ax.yaxis.set_ticklabels([])
+                ax.yaxis.set_ticks_position('none') 
+            else:
+                ax.set_yticks([0.1, 0.3, 0.5, 0.7, 0.9])
+                ax.set_ylabel('Pred. Conc.', fontsize=22)
+
+            ax.set_title(f'{data_columns[idx]}\nMSE={mse:.3f}', fontsize=21)
+            ax.set_xlabel('True Conc.', fontsize=20)
+        else:
+            ax.axis('off')
+    return MSEs
+
+
+def generate_img(filtered_mask, spectra_dict, data):
+    img = np.zeros(filtered_mask.shape)
+    for idx, key in enumerate(list(spectra_dict.keys())):
+        x, y = key
+        img[x, y] = data[idx]
+    return img
