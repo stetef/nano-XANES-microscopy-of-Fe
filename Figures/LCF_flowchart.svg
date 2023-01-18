@@ -100,8 +100,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="401.90377"
-     inkscape:cy="165.19459"
+     inkscape:cx="534.69351"
+     inkscape:cy="348.16486"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -198,25 +198,25 @@
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="88.370834"
-       y="121.29257"
+       x="67.697533"
+       y="121.10548"
        id="text896"><tspan
          sodipodi:role="line"
          id="tspan894"
-         x="88.370834"
-         y="121.29257"
-         style="font-size:6.35px;stroke-width:0.264583">Yes</tspan></text>
+         x="67.697533"
+         y="121.10548"
+         style="font-size:6.35px;stroke-width:0.264583">Linear</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="115.39613"
-       y="121.38705"
+       x="121.19588"
+       y="121.01287"
        id="text900"><tspan
          sodipodi:role="line"
          id="tspan898"
-         x="115.39613"
-         y="121.38705"
-         style="font-size:6.35px;stroke-width:0.264583">No</tspan></text>
+         x="121.19588"
+         y="121.01287"
+         style="font-size:6.35px;stroke-width:0.264583">Nonlinear</tspan></text>
     <rect
        style="fill:#eed7f4;fill-rule:evenodd;stroke:none;stroke-width:0.27003;paint-order:markers fill stroke"
        id="rect971"
@@ -345,24 +345,6 @@
        id="path905"
        sodipodi:nodetypes="cc" />
     <rect
-       style="fill:#ffd5e5;fill-rule:evenodd;stroke:none;stroke-width:0.0241376;stroke-miterlimit:4;stroke-dasharray:0.0241376, 0.0241376;stroke-dashoffset:0;paint-order:markers fill stroke"
-       id="rect921"
-       width="3.9687526"
-       height="5.8208237"
-       x="103.98125"
-       y="110.06667" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="93.353889"
-       y="114.8097"
-       id="text911"><tspan
-         sodipodi:role="line"
-         x="93.353889"
-         y="114.8097"
-         style="stroke-width:0.264583"
-         id="tspan915">Nonlinear?</tspan></text>
-    <rect
        style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
        id="rect932"
        width="26.458334"
@@ -370,19 +352,6 @@
        x="63.764584"
        y="125.67708"
        ry="0" />
-    <path
-       sodipodi:type="spiral"
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.539474;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path934"
-       sodipodi:cx="182.5625"
-       sodipodi:cy="89.958336"
-       sodipodi:expansion="1"
-       sodipodi:revolution="3.1300001"
-       sodipodi:radius="11.28431"
-       sodipodi:argument="-18.064157"
-       sodipodi:t0="0"
-       transform="matrix(-0.71794924,0.57996622,-0.55892796,-0.74497313,259.13834,97.66146)"
-       d="m 182.5625,89.958336 c 0.38345,0.383449 -0.3277,0.706061 -0.63732,0.637317 -0.83904,-0.186293 -0.97392,-1.260999 -0.63731,-1.911952 0.6021,-1.164402 2.16564,-1.300811 3.18658,-0.637316 1.49828,0.973705 1.63739,3.08256 0.63732,4.461221 -1.33294,1.837538 -4.00383,1.978097 -5.73586,0.637315 -2.17957,-1.687237 -2.32094,-4.927182 -0.63731,-7.01049 2.03909,-2.523165 5.8517,-2.665019 8.28512,-0.637315 2.86771,2.38958 3.00988,6.776949 0.63732,9.559759 -2.73922,3.212865 -7.70269,3.355248 -10.8344,0.637315 -3.55844,-3.08829 -3.70098,-8.62876 -0.63731,-12.109028 3.43697,-3.904335 9.55508,-4.046983 13.38366,-0.637314 4.25045,3.785379 4.39318,10.481599 0.63732,14.658297 -2.02963,2.257033 -4.97221,3.572185 -8.00227,3.630935" />
     <rect
        style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
        id="rect923"
@@ -393,7 +362,7 @@
        ry="0" />
     <g
        id="g987"
-       transform="translate(-5.086263e-6,-1.3229167)">
+       transform="translate(-58.208335,-1.3229167)">
       <rect
          style="fill:#eed7f4;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
          id="rect891"
@@ -448,27 +417,6 @@
        height="16.404169"
        x="132.29167"
        y="152.39999" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.95;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="135.02246"
-       y="156.2574"
-       id="text944"><tspan
-         sodipodi:role="line"
-         x="135.02246"
-         y="156.2574"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan948">Pick top few</tspan><tspan
-         sodipodi:role="line"
-         x="135.02246"
-         y="161.61961"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan974">principal</tspan><tspan
-         sodipodi:role="line"
-         x="135.02246"
-         y="166.98184"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan960">components</tspan></text>
     <rect
        style="fill:#ffd5e5;fill-rule:evenodd;stroke:none;stroke-width:0.0490732;stroke-miterlimit:4;stroke-dasharray:0.0490732, 0.0490732;stroke-dashoffset:0;paint-order:markers fill stroke"
        id="rect978"
@@ -479,24 +427,24 @@
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:0.95;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="76.958153"
-       y="156.32692"
-       id="text932"><tspan
+       x="76.814133"
+       y="156.2574"
+       id="text944"><tspan
          sodipodi:role="line"
-         x="76.958153"
-         y="156.32692"
+         x="76.814133"
+         y="156.2574"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan930">Uniform Manifold</tspan><tspan
+         id="tspan948">Pick top few</tspan><tspan
          sodipodi:role="line"
-         x="76.958153"
-         y="161.68913"
+         x="76.814133"
+         y="161.61961"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan936">Approximation</tspan><tspan
+         id="tspan974">principal</tspan><tspan
          sodipodi:role="line"
-         x="76.958153"
-         y="167.05136"
+         x="76.814133"
+         y="166.98184"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan972">&amp; Projection</tspan></text>
+         id="tspan960">components</tspan></text>
     <rect
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
        id="rect991"
@@ -520,43 +468,25 @@
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="88.90538"
-       y="189.2858"
+       x="58.814056"
+       y="189.24706"
        id="text997"><tspan
          sodipodi:role="line"
          id="tspan995"
-         x="88.90538"
-         y="189.2858"
-         style="font-size:6.35px;stroke-width:0.264583">Yes</tspan></text>
+         x="58.814056"
+         y="189.24706"
+         style="font-size:6.35px;stroke-width:0.264583">Center of mass</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="115.93068"
-       y="189.38028"
-       id="text1001"><tspan
-         sodipodi:role="line"
-         id="tspan999"
-         x="115.93068"
-         y="189.38028"
-         style="font-size:6.35px;stroke-width:0.264583">No</tspan></text>
-    <rect
-       style="fill:#ffe6d5;fill-rule:evenodd;stroke:none;stroke-width:0.0265747;stroke-miterlimit:4;stroke-dasharray:0.0265747, 0.0265747;stroke-dashoffset:0;paint-order:markers fill stroke"
-       id="rect1007"
-       width="5.291667"
-       height="5.2916684"
-       x="103.1875"
-       y="177.8" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="87.407143"
-       y="181.7106"
+       x="112.35709"
+       y="188.37057"
        id="text1005"><tspan
          sodipodi:role="line"
-         x="87.407143"
-         y="181.7106"
+         x="112.35709"
+         y="188.37057"
          style="stroke-width:0.264583"
-         id="tspan1003">Density-based?</tspan></text>
+         id="tspan1003">Density-based</tspan></text>
     <rect
        style="fill:#ffe6d5;fill-rule:evenodd;stroke:none;stroke-width:0.0237691;stroke-miterlimit:4;stroke-dasharray:0.0237691, 0.0237691;stroke-dashoffset:0;paint-order:markers fill stroke"
        id="rect1049"
@@ -567,23 +497,23 @@
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="67.991982"
-       y="208.42671"
+       x="126.46489"
+       y="208.4267"
        id="text1011"><tspan
          sodipodi:role="line"
-         x="67.991982"
-         y="208.42671"
+         x="126.46489"
+         y="208.4267"
          style="stroke-width:0.264583"
          id="tspan1009">dbscan</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="125.15416"
-       y="208.05014"
+       x="66.876038"
+       y="207.86305"
        id="text1015"><tspan
          sodipodi:role="line"
-         x="125.15416"
-         y="208.05014"
+         x="66.876038"
+         y="207.86305"
          style="stroke-width:0.264583"
          id="tspan1013">k-means</tspan></text>
     <rect
@@ -602,86 +532,94 @@
        x="128.32292"
        y="193.14584"
        ry="0" />
-    <ellipse
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#cccccc;stroke-width:0.4;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:0.8, 0.8;stroke-dashoffset:0;paint-order:markers fill stroke"
-       id="path1031"
-       cx="134.94884"
-       cy="198.46419"
-       rx="3.7041667"
-       ry="3.5718749" />
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="path1021"
-       cx="134.91946"
-       cy="194.93092"
-       r="0.39687499" />
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="circle1023"
-       cx="131.72891"
-       cy="200.49347"
-       r="0.39687499" />
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="circle1025"
-       cx="138.52812"
-       cy="199.40971"
-       r="0.39687499" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
-       x="134.31943"
-       y="199.07227"
-       id="text1029"><tspan
-         sodipodi:role="line"
-         id="tspan1027"
+    <g
+       id="g957"
+       transform="translate(-58.27812,-0.18708867)">
+      <ellipse
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#cccccc;stroke-width:0.4;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:0.8, 0.8;stroke-dashoffset:0;paint-order:markers fill stroke"
+         id="path1031"
+         cx="134.94884"
+         cy="198.46419"
+         rx="3.7041667"
+         ry="3.5718749" />
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="path1021"
+         cx="134.91946"
+         cy="194.93092"
+         r="0.39687499" />
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="circle1023"
+         cx="131.72891"
+         cy="200.49347"
+         r="0.39687499" />
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="circle1025"
+         cx="138.52812"
+         cy="199.40971"
+         r="0.39687499" />
+      <text
+         xml:space="preserve"
+         style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
          x="134.31943"
          y="199.07227"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.76389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.264583">X</tspan></text>
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="circle1033"
-       cx="76.420845"
-       cy="195.46547"
-       r="0.39687499" />
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="circle1035"
-       cx="73.230293"
-       cy="201.02802"
-       r="0.39687499" />
-    <circle
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
-       id="circle1037"
-       cx="79.819031"
-       cy="198.93866"
-       r="0.39687499" />
-    <path
-       style="fill:none;stroke:#cccccc;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 75.935417,196.05625 -2.38125,4.49792"
-       id="path1039"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#cccccc;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 76.99375,196.05625 79.375,198.4375"
-       id="path1045"
-       sodipodi:nodetypes="cc" />
+         id="text1029"><tspan
+           sodipodi:role="line"
+           id="tspan1027"
+           x="134.31943"
+           y="199.07227"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.76389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.264583">X</tspan></text>
+    </g>
+    <g
+       id="g949"
+       transform="translate(58.472919)">
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="circle1033"
+         cx="76.420845"
+         cy="195.46547"
+         r="0.39687499" />
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="circle1035"
+         cx="73.230293"
+         cy="201.02802"
+         r="0.39687499" />
+      <circle
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="circle1037"
+         cx="79.819031"
+         cy="198.93866"
+         r="0.39687499" />
+      <path
+         style="fill:none;stroke:#cccccc;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 75.935417,196.05625 -2.38125,4.49792"
+         id="path1039"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;stroke:#cccccc;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 76.99375,196.05625 79.375,198.4375"
+         id="path1045"
+         sodipodi:nodetypes="cc" />
+    </g>
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';text-align:center;text-anchor:middle;stroke-width:0.264583"
-       x="103.89135"
+       x="105.57515"
        y="15.733674"
        id="text1057"><tspan
          sodipodi:role="line"
          id="tspan1055"
-         x="103.89135"
+         x="105.57515"
          y="15.733674"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583">Unbiased classification: </tspan><tspan
          sodipodi:role="line"
-         x="103.89135"
+         x="105.57515"
          y="22.789225"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan1093">Yes = Our pipeline v.s. No = Traditional</tspan></text>
+         id="tspan1093">Left = Traditional v.s. Right = Proposed</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:0.95;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';text-align:center;text-anchor:middle;stroke-width:0.264583"
@@ -772,5 +710,39 @@
        d="m 105.83333,58.208333 v 3.175"
        id="path970"
        sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:type="spiral"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.539474;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path934"
+       sodipodi:cx="182.5625"
+       sodipodi:cy="89.958336"
+       sodipodi:expansion="1"
+       sodipodi:revolution="3.1300001"
+       sodipodi:radius="11.28431"
+       sodipodi:argument="-18.064157"
+       sodipodi:t0="0"
+       transform="matrix(-0.71794924,0.57996622,-0.55892796,-0.74497313,317.61126,98.719793)"
+       d="m 182.5625,89.958336 c 0.38345,0.383449 -0.3277,0.706061 -0.63732,0.637317 -0.83904,-0.186293 -0.97392,-1.260999 -0.63731,-1.911952 0.6021,-1.164402 2.16564,-1.300811 3.18658,-0.637316 1.49828,0.973705 1.63739,3.08256 0.63732,4.461221 -1.33294,1.837538 -4.00383,1.978097 -5.73586,0.637315 -2.17957,-1.687237 -2.32094,-4.927182 -0.63731,-7.01049 2.03909,-2.523165 5.8517,-2.665019 8.28512,-0.637315 2.86771,2.38958 3.00988,6.776949 0.63732,9.559759 -2.73922,3.212865 -7.70269,3.355248 -10.8344,0.637315 -3.55844,-3.08829 -3.70098,-8.62876 -0.63731,-12.109028 3.43697,-3.904335 9.55508,-4.046983 13.38366,-0.637314 4.25045,3.785379 4.39318,10.481599 0.63732,14.658297 -2.02963,2.257033 -4.97221,3.572185 -8.00227,3.630935" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:0.95;font-family:'Cambria Math';-inkscape-font-specification:'Cambria Math';stroke-width:0.264583"
+       x="135.43108"
+       y="156.43652"
+       id="text932"><tspan
+         sodipodi:role="line"
+         x="135.43108"
+         y="156.43652"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan930">Uniform Manifold</tspan><tspan
+         sodipodi:role="line"
+         x="135.43108"
+         y="161.79874"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan936">Approximation</tspan><tspan
+         sodipodi:role="line"
+         x="135.43108"
+         y="167.16096"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan972">&amp; Projection</tspan></text>
   </g>
 </svg>

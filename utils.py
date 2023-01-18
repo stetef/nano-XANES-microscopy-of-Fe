@@ -1132,7 +1132,7 @@ def histogram_of_importance(plot, x, energy, Refs, bins=50, color=plt.cm.tab20b(
 
 
 def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
-                     leg=False, loc=1, **kwargs):
+                     leg=False, loc=1, alpha=0.05, **kwargs):
     for i, b in enumerate(basis):
         axes[0].plot(x, b, linewidth=3, color=colors[i], label=f'$x_{i + 1}$')
 
@@ -1145,32 +1145,30 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
     data, coeffs = generate_linear_combos(basis, **kwargs)
 
     for d in data:
-        axes[1].plot(x, d, color='gray', alpha=0.05, linewidth=3)
+        axes[1].plot(x, d, color='gray', alpha=alpha, linewidth=3)
 
     var = np.std(data, axis=0)
-    axes[1].plot(x, var, color='k', linewidth=2, alpha=0.5)
+    axes[1].plot(x, var, color='k', linewidth=3, alpha=1)
 
     for ax in axes:
         ax.tick_params(width=2, length=6, labelsize=15, direction='out')
+    for ax in [axes[0], axes[1]]:
+        ax.text(0.5, 0.2, 'Variance', fontsize=20, ha='left', va='top',
+                transform=ax.transAxes)
     
     labels = np.arange(1, len(indices) + 1)
     label_map = {idx: label for idx, label in zip(indices, labels)}
     
-    bins = basis.shape[1]
-    n_reps = len(Is)
-    colors = [plt.cm.Dark2(2) for i in range(n_reps)]
-    n, bin_vals, patches = axes[2].hist(Is.T, bins=bins, range=(0, bins), edgecolor='w',
-                                        linewidth=0.5, color=colors, stacked=True, alpha=1.)
-    axes[2].plot(var / np.max(var) * np.max(n), color='k', linewidth=3)
+    bins = len(x)
+    hist, bvals = np.histogram(Is.reshape(-1), bins=bins)
+    res = x[1] - x[0]
+    axes[2].bar(x, hist, width=res, edgecolor='w', linewidth=0.3, color=plt.cm.Dark2(2))
+    axes[2].plot(x, var / np.max(var) * np.max(hist), color='k', linewidth=3, alpha=0.5)
 
     for idx, label in label_map.items():
-        height = 0
-        for patch in patches:
-            rect = patch[idx]
-            h = rect.get_height()
-            height += h
-        ax.text(rect.get_x() + rect.get_width() / 2, height + 0, label,
-                ha='center', va='bottom', fontsize=14)
+        height = hist[idx]
+        axes[2].text(x[idx] + res / 2, height + 0, label,
+                     ha='center', va='bottom', fontsize=14)
 
 
 def get_RFE_results(base_estimator, x, basis, Ns, reps,
