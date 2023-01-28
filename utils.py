@@ -1079,7 +1079,7 @@ def get_coeffs(n, dropout):
     return coeffs
 
 
-def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5):
+def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5, percent=True):
     """Create linear combo dataset from Refs."""
     n = len(Refs)
     Data = []
@@ -1089,8 +1089,12 @@ def generate_linear_combos(Refs, scale=0, N=10, dropout=0.5):
         x = Refs.T @ coeffs
         x = x - min(x)
         if scale != 0:
-            noise = np.random.normal(scale=scale * x,
-                                     size=Refs.shape[1])
+            if percent:
+                noise = np.random.normal(scale=scale * x,
+                                         size=Refs.shape[1])
+            else:
+                noise = np.random.normal(scale=scale,
+                                         size=Refs.shape[1])
         else:
             noise = 0
         Data.append(x + noise)
@@ -1160,7 +1164,7 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
     label_map = {idx: label for idx, label in zip(indices, labels)}
     
     bins = len(x)
-    hist, bvals = np.histogram(Is.reshape(-1), bins=bins)
+    hist, bvals = np.histogram(Is.reshape(-1), bins=bins, range=(0, len(x)))
     res = x[1] - x[0]
     axes[2].bar(x, hist, width=res, edgecolor='w', linewidth=0.3, color=plt.cm.Dark2(2))
     axes[2].plot(x, var / np.max(var) * np.max(hist), color='k', linewidth=3, alpha=0.5)
@@ -1171,7 +1175,7 @@ def plot_RFE_results(axes, x, basis, indices, Is, best_n, colors,
                      ha='center', va='bottom', fontsize=14)
 
 
-def get_RFE_results(base_estimator, x, basis, Ns, reps,
+def get_RFE_results(base_estimator, x_energy, basis, Ns, reps,
                     energy_point_selector, colors, n_estimators=1,
                     plot=False, select_n_for_me=False, verbose=True,
                     return_axes=False,
@@ -1215,9 +1219,9 @@ def get_RFE_results(base_estimator, x, basis, Ns, reps,
                 else:
                     rfe = select.select_energy_points(estimator=base_estimator, n_points=best_n,
                                                       verbose=verbose, scoring=scoring)
-            energy_measurements = x[rfe.support_]
+            energy_measurements = x_energy[rfe.support_]
 
-            indices = [i for i, e in enumerate(x) if e in energy_measurements]
+            indices = [i for i, e in enumerate(x_energy) if e in energy_measurements]
             Is.append(indices)
 
         if select_n_for_me:
@@ -1243,7 +1247,7 @@ def get_RFE_results(base_estimator, x, basis, Ns, reps,
 
         indices = []
         if plot:
-            plot_RFE_results(axes, x, basis, indices, Is, best_n, colors, leg=True,
+            plot_RFE_results(axes, x_energy, basis, indices, Is, best_n, colors, leg=True,
                              **kwargs)
         Scores.append(scores)
 
