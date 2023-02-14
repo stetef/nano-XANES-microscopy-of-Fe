@@ -628,11 +628,10 @@ def make_UMAP_plot(pca_components, spectra_dict, n_neighbors=4.5, min_dist=0,
     return color_labels, codemap, dbscan_clustering
 
 
-def plot_color_code_map(plot, spectra_dict, color_labels):
+def plot_color_code_map(plot, spectra_dict, colors):
     fig, ax = plot
     keys = np.array(list(spectra_dict.keys()))
     xs, ys = keys.T
-    colors = [plt.cm.tab20(c) for c in color_labels]
     ax.scatter(ys, -xs, c=colors, s=4.5)
     remove_ticks(ax)
 
@@ -1356,38 +1355,82 @@ def find_diversity(avg_spectra, dbscan_clustering, normalized_spectra):
     return diversity, xbar, s
 
 
-def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', clustering='k-means',
+def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_strength=0, xrf=None,
+                               method='PCA', clustering='k-means', spatial_strength=0,
                                translation=1, eps=1, perplexity=50, n_neighbors=80, n_clusters=4,
                                early_exaggeration=12, data_description='full_spectra', verbose=False):
     """Dimension reduction and clustering in 2D with different clustering and dim. red. methods."""
-    pca = PCA(n_components=6)
-    pca_components = pca.fit_transform(data)
+    true_contrib_indices = [0, 2, 3, 7]
+    targets = normalized_spectra
+    basis = Refs[true_contrib_indices]
+    expected_coeffs = np.array([list(nnls(basis.T, target)[0]) for target in targets])
 
+    pca = PCA(n_components=6)
+    pca_components = pca.fit_transform(normalized_spectra)
+
+    # spatial encoding
+    pts = np.array(list(data_dict.keys()))
+    w, h = 155, 160
+    if spatial_strength != 0:
+        input_space = np.zeros((pca_components.shape[0], pca_components.shape[1] + 2))
+        input_space[:, :pca_components.shape[1]] = pca_components.copy()
+        input_space[:, -2] = pts[:, 0] / w * spatial_strength
+        input_space[:, -1] = pts[:, 1] / h * spatial_strength
+    else:
+        input_space = pca_components
+
+    # xrf encoding
+    if xrf_strength != 0:
+        tmp = np.zeros((input_space.shape[0], input_space.shape[1] + 3))
+        tmp[:, :input_space.shape[1]] = input_space.copy()
+        if xrf is not None:
+            tmp[:, -3:] = xrf_strength * xrf
+        else:
+            print("You specified an xrf stength but have not given xrf data.")
+        input_space = tmp
+    else:
+        pass
+
+    print(input_space.shape)
+
+    # dimensionality reduction
     if method == 'PCA':
-        reduced_space = pca_components
+        reduced_space = input_space
     elif method =='UMAP':
         reducer = umap.UMAP(random_state=42, n_components=2,
                             n_neighbors=n_neighbors, min_dist=0)
-        reduced_space = reducer.fit_transform(pca_components)
+        reduced_space = reducer.fit_transform(input_space)
     elif method == 't-SNE':
         reducer = TSNE(n_components=2, perplexity=perplexity,
                        early_exaggeration=early_exaggeration, random_state=42)
-        reduced_space = reducer.fit_transform(pca_components)
+        reduced_space = reducer.fit_transform(input_space)
        
+    # clustering
     if clustering == 'k-means':
         clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
     elif clustering == 'dbscan':
         clusterizer = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
         print(f"Couldn't cluster {np.sum(clusterizer.labels_ == -1)} points")
 
+    # cluster color codes
     cluster_dict = {loc: clusterizer.labels_[i] for i, loc in enumerate(list(data_dict.keys()))}
     color_labels, codemap = get_translated_colors(clusterizer, data_dict, map_colors=True,
                                                   translation=translation)
     colors = [plt.cm.tab20(c) for c in color_labels]
+    if translation not in np.arange(1, 6):
+        colors = [discrete_cmap[c] for c in color_labels]
+    
+    # cluster avgs of just spectra
+    cluster_avgs = [[] for i in np.unique(clusterizer.labels_)]
+    for i, s in enumerate(normalized_spectra):
+        cluster_avgs[clusterizer.labels_[i]].append(s)
+    for i in np.unique(clusterizer.labels_):
+        cluster_avgs[i] = np.average(cluster_avgs[i], axis=0)
+    cluster_avgs = np.array(cluster_avgs)
 
-    fig, axes = plt.subplots(figsize=(13, 4), ncols=3)
-    plt.subplots_adjust(wspace=0.1)
+    fig, axes = plot
 
+    # plot redcued space
     ax = axes[0]
     ax.scatter(reduced_space[:, 0], reduced_space[:, 1], marker='o', s=25, color=colors,
                edgecolor='w', linewidth=0.3)
@@ -1403,11 +1446,49 @@ def two_dimensional_clustering(data, data_dict, expected_results, method='PCA', 
     ax.set_yticks([])
     ax.set_title(f'{clustering} clustering', fontsize=19)
 
-    plot_color_code_map((fig, axes[1]), data_dict, color_labels)
+    # plot phase map
+    plot_color_code_map((fig, axes[1]), data_dict, colors)
     axes[1].set_title('XANES map', fontsize=18)
 
-    plot_expected_results(expected_results, axes[2])
-    axes[2].set_title('Expected results', fontsize=18)
+    # plot LASSO resuts
+    pts = np.array(list(data_dict.keys()))
+    basis = Refs
+    cluster_pred_coeffs = get_coeffs_from_spectra(cluster_avgs, basis)
+    color_labels = [6, 3, 13, 12, 14, 14, 19, 19, 19, 19]
+    
+    cluster_colors = [plt.cm.tab20(color_labels[c]) for c in np.argmax(cluster_pred_coeffs, axis=1)] 
+    pred_colors = [cluster_colors[clusterizer.labels_[i]] for i, s in enumerate(normalized_spectra)]
+    axes[2].scatter(pts[:, 1], -pts[:, 0], c=pred_colors, s=2)
+    axes[2].set_title('LASSO LCF', fontsize=19)
+
+    #plot expected results
+    color_labels = [6, 13, 12, 19]
+    concentrations = np.argsort(expected_coeffs, axis=1)
+
+    expected_colors = np.array([plt.cm.tab20(color_labels[c])
+                                for c in concentrations[:, -1]])
+    axes[3].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2)
+    axes[3].set_title('1st Expected Conc', fontsize=18)
+
+    expected_colors = np.array([plt.cm.tab20(color_labels[c])
+                                for c in concentrations[:, -2]])
+    axes[4].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2)
+    axes[4].set_title('2nd Expected Conc', fontsize=18)
+    
+
+    # add legends
+    labels = ['LFP', 'Pyr', 'SS', 'Hem']
+    color_labels = [12, 13, 6, 19]
+    colors = [plt.cm.tab20(c) for c in color_labels]
+    patches = [mpatches.Patch(color=plt.cm.tab20(color_labels[i]),
+               label=labels[i]) for i in range(len(labels))]
+    for ax in [axes[2], axes[3], axes[4]]:
+        leg = ax.legend(handles=patches, fontsize=18, ncol=2, framealpha=0,
+                        handlelength=.6, loc=1, bbox_to_anchor=(1.06, 1.04),
+                        labelspacing=.1, handletextpad=0.12, columnspacing=0.25)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
     plt.savefig(f'Figures/{method}_{clustering}_{data_description}.png', dpi=600, bbox_inches='tight')
 
     if verbose:
