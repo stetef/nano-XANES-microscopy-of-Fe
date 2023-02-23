@@ -27,8 +27,11 @@ class Selector:
         self.Data = data
         self.Coeffs = coeffs
 
-    def select_energy_points(self, n_points=None, estimator='dt', verbose=True,
-                             scoring='neg_root_mean_squared_error',
+    def step_score(self, estimator, features):
+        return estimator.score(self.Data[:, features], self.Coeffs)
+
+    def select_energy_points(self, n_points=None, estimator='dt', verbose=False,
+                             scoring='r2',
                              **kwargs):
         """Return the n_points that are most important."""
         if estimator.lower().replace(' ', '') in ['linear',
@@ -48,11 +51,17 @@ class Selector:
 
         if n_points is None:
             cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
-            rfe = RFECV(model, step=5, cv=cv, scoring=scoring)
+            rfe = RFECV(model, step=1, cv=cv, scoring=scoring, verbose=False)
         else:
-            rfe = RFE(model, n_features_to_select=n_points, step=5)
+            rfe = RFE(model, n_features_to_select=n_points, step=1,
+                      verbose=False)
 
-        self.rfe = rfe.fit(self.Data, self.Coeffs)
+        self.rfe = rfe
+
+        if verbose:
+            self.rfe = rfe._fit(self.Data, self.Coeffs, step_score=self.step_score)
+        else:
+            self.rfe = rfe.fit(self.Data, self.Coeffs)
 
         if verbose:
             return self.rfe, self.evaluate_rfe(scoring=scoring)

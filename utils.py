@@ -1354,17 +1354,9 @@ def find_diversity(avg_spectra, dbscan_clustering, normalized_spectra):
               "is not statisitcally significant.")
     return diversity, xbar, s
 
-
-def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_strength=0, xrf=None,
-                               method='PCA', clustering='k-means', spatial_strength=0,
-                               translation=1, eps=1, perplexity=50, n_neighbors=80, n_clusters=4,
-                               early_exaggeration=12, data_description='full_spectra', verbose=False):
-    """Dimension reduction and clustering in 2D with different clustering and dim. red. methods."""
-    true_contrib_indices = [0, 2, 3, 7]
-    targets = normalized_spectra
-    basis = Refs[true_contrib_indices]
-    expected_coeffs = np.array([list(nnls(basis.T, target)[0]) for target in targets])
-
+def get_reduced_space(normalized_spectra, data_dict, xrf_strength=0, xrf=None, spatial_strength=0,
+                      method='PCA', perplexity=50, n_neighbors=80, early_exaggeration=12):
+    
     pca = PCA(n_components=6)
     pca_components = pca.fit_transform(normalized_spectra)
 
@@ -1391,8 +1383,6 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     else:
         pass
 
-    print(input_space.shape)
-
     # dimensionality reduction
     if method == 'PCA':
         reduced_space = input_space
@@ -1404,7 +1394,10 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
         reducer = TSNE(n_components=2, perplexity=perplexity,
                        early_exaggeration=early_exaggeration, random_state=42)
         reduced_space = reducer.fit_transform(input_space)
-       
+
+    return reduced_space
+
+def apply_clustering(reduced_space, clustering, data_dict, translation=-1, n_clusters=4, eps=1):
     # clustering
     if clustering == 'k-means':
         clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
@@ -1419,14 +1412,38 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     colors = [plt.cm.tab20(c) for c in color_labels]
     if translation not in np.arange(1, 6):
         colors = [discrete_cmap[c] for c in color_labels]
-    
-    # cluster avgs of just spectra
+
+    return clusterizer, cluster_dict, color_labels, codemap, colors
+
+def get_cluster_avgs(clusterizer, normalized_spectra):
     cluster_avgs = [[] for i in np.unique(clusterizer.labels_)]
     for i, s in enumerate(normalized_spectra):
         cluster_avgs[clusterizer.labels_[i]].append(s)
     for i in np.unique(clusterizer.labels_):
         cluster_avgs[i] = np.average(cluster_avgs[i], axis=0)
-    cluster_avgs = np.array(cluster_avgs)
+    return np.array(cluster_avgs)
+
+
+def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_strength=0, xrf=None,
+                               method='PCA', clustering='k-means', spatial_strength=0,
+                               translation=1, eps=1, perplexity=50, n_neighbors=80, n_clusters=4,
+                               early_exaggeration=12, data_description='full_spectra', verbose=False):
+    """Dimension reduction and clustering in 2D with different clustering and dim. red. methods."""
+    true_contrib_indices = [0, 2, 3, 7]
+    targets = normalized_spectra
+    basis = Refs[true_contrib_indices]
+    expected_coeffs = np.array([list(nnls(basis.T, target)[0]) for target in targets])
+
+    reduced_space = get_reduced_space(normalized_spectra, data_dict, 
+                                      xrf_strength=xrf_strength, xrf=xrf, 
+                                      spatial_strength=spatial_strength,
+                                      method=method, perplexity=perplexity, 
+                                      n_neighbors=n_neighbors, 
+                                      early_exaggeration=early_exaggeration)       
+    clusterizer, cluster_dict, color_labels, codemap, colors = apply_clustering(reduced_space, 
+        clustering, data_dict, translation=translation, n_clusters=n_clusters, eps=eps)
+
+    cluster_avgs = get_cluster_avgs(clusterizer, normalized_spectra)
 
     fig, axes = plot
 
@@ -1435,16 +1452,9 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     ax.scatter(reduced_space[:, 0], reduced_space[:, 1], marker='o', s=25, color=colors,
                edgecolor='w', linewidth=0.3)
 
-    if method == 'PCA':
-        axis_label = 'PC'
-    else:
-        axis_label = method
-    
-    ax.set_ylabel(f'${axis_label}_1$', fontsize=20)
-    ax.set_xlabel(f'${axis_label}_2$', fontsize=20)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title(f'{clustering} clustering', fontsize=19)
+    ax.set_title(f'{clustering} on {method}', fontsize=19)
 
     # plot phase map
     plot_color_code_map((fig, axes[1]), data_dict, colors)
@@ -1458,21 +1468,30 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     
     cluster_colors = [plt.cm.tab20(color_labels[c]) for c in np.argmax(cluster_pred_coeffs, axis=1)] 
     pred_colors = [cluster_colors[clusterizer.labels_[i]] for i, s in enumerate(normalized_spectra)]
-    axes[2].scatter(pts[:, 1], -pts[:, 0], c=pred_colors, s=2)
+    pred_coeffs = np.array([cluster_pred_coeffs[clusterizer.labels_[i]] 
+                            for i, s in enumerate(normalized_spectra)])
+    alphas = np.sort(pred_coeffs, axis=1)
+    alphas = alphas - np.min(alphas)
+    alphas = alphas / np.max(alphas)
+
+    axes[2].scatter(pts[:, 1], -pts[:, 0], c=pred_colors, s=2, alpha=alphas[:,  -1])
     axes[2].set_title('LASSO LCF', fontsize=19)
 
     #plot expected results
     color_labels = [6, 13, 12, 19]
     concentrations = np.argsort(expected_coeffs, axis=1)
+    alphas = np.sort(expected_coeffs, axis=1)
+    alphas = alphas - np.min(alphas)
+    alphas = alphas / np.max(alphas)
 
     expected_colors = np.array([plt.cm.tab20(color_labels[c])
                                 for c in concentrations[:, -1]])
-    axes[3].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2)
+    axes[3].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -1])
     axes[3].set_title('1st Expected Conc', fontsize=18)
 
     expected_colors = np.array([plt.cm.tab20(color_labels[c])
                                 for c in concentrations[:, -2]])
-    axes[4].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2)
+    axes[4].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -2])
     axes[4].set_title('2nd Expected Conc', fontsize=18)
     
 
