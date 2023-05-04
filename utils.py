@@ -305,7 +305,7 @@ def plot_expected_results(expected_results, ax):
                     handletextpad=0.25, columnspacing=0.7, bbox_to_anchor=(1.05, 1.03))
 
 
-def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=True, mod=0, c=17,
+def make_scree_plot(data, n=5, threshold=0.95, show_first_PC=False, mod=0, c=17,
                     xy=(0.7, 0.3)):
     fig, ax = plt.subplots(figsize=(8,6))
     pca = PCA()
@@ -352,10 +352,16 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
                        y_fit_post=None, whiteline_range=10):
     if whiteline is None:
         whiteline = np.argmax(np.gradient(spectrum[:whiteline_range]))
+        #whiteline = np.argmax(spectrum[:whiteline_range])
 
     if y_fit_post is None:
-        e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
-        y_post = spectrum[whiteline + post_edge_offset:].reshape(-1, 1)
+        if post_edge_offset < 0:
+            e_post = energy[post_edge_offset:].reshape(-1, 1)
+            y_post = spectrum[post_edge_offset:].reshape(-1, 1)
+        else:
+            e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
+            y_post = spectrum[whiteline + post_edge_offset:].reshape(-1, 1)
+        
         reg_post = LinearRegression().fit(e_post, y_post)
 
         post_edge = energy[whiteline:].reshape(-1, 1)
@@ -367,8 +373,13 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
         if pre_edge_offset == 'none':
             y_fit_pre = y_norm[0]
         else:
-            e_pre = energy[:whiteline - pre_edge_offset].reshape(-1, 1)
-            y_pre = y_norm[:whiteline - pre_edge_offset].reshape(-1, 1)
+            if pre_edge_offset > 0:
+                e_pre = energy[:pre_edge_offset].reshape(-1, 1)
+                y_pre = y_norm[:pre_edge_offset].reshape(-1, 1)
+            else:
+                e_pre = energy[:whiteline + pre_edge_offset].reshape(-1, 1)
+                y_pre = y_norm[:whiteline + pre_edge_offset].reshape(-1, 1)
+            
             reg_pre = LinearRegression().fit(e_pre, y_pre)
             y_fit_pre = reg_pre.predict(energy.reshape(-1, 1)).reshape(-1)
     
@@ -388,13 +399,65 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
         return y_norm
 
 
+def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
+              post_edge_offset=10, whiteline_range=10):
+    
+    if whiteline_mode == 'gradient':
+        whiteline = np.argmax(np.gradient(spectrum[:whiteline_range]))
+    else:
+        whiteline = np.argmax(spectrum[:whiteline_range])
+
+    y_norm = spectrum.copy()
+
+    if post_edge_offset == 'none':
+        y_fit_post = spectrum[-1]
+    else:
+        if post_edge_offset < 0:
+            e_post = energy[post_edge_offset:].reshape(-1, 1)
+            y_post = spectrum[post_edge_offset:].reshape(-1, 1)
+        else:
+            e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
+            y_post = spectrum[whiteline + post_edge_offset:].reshape(-1, 1)
+            
+        reg_post = LinearRegression().fit(e_post, y_post)
+
+        post_edge = energy[whiteline:].reshape(-1, 1)
+        y_fit_post = reg_post.predict(post_edge)
+
+    if pre_edge_offset == 'none':
+        y_fit_pre = y_norm[0]
+    else:
+        if pre_edge_offset > 0:
+            e_pre = energy[:pre_edge_offset].reshape(-1, 1)
+            y_pre = y_norm[:pre_edge_offset].reshape(-1, 1)
+        else:
+            e_pre = energy[:whiteline + pre_edge_offset].reshape(-1, 1)
+            y_pre = y_norm[:whiteline + pre_edge_offset].reshape(-1, 1)
+            
+        reg_pre = LinearRegression().fit(e_pre, y_pre)
+        y_fit_pre = reg_pre.predict(energy.reshape(-1, 1)).reshape(-1)
+    
+    y_norm = y_norm - y_fit_pre
+
+    line = y_fit_post.reshape(-1) 
+    y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
+    
+    if y_fit_pre.shape == ():
+        y_norm = y_norm / (line[0] - y_fit_pre)
+    else:
+        y_norm = y_norm / (line[0] - y_fit_pre[whiteline])
+
+    return y_norm
+
+
 def normalize_spectra(energy, spectra_list, spectra_dict, whiteline_range=10,
-                      pre_edge_offset=20, post_edge_offset=10):
+                      pre_edge_offset=20, post_edge_offset=10, whiteline_mode='gradient'):
     normalized_spectra = []
     for i, spectrum in enumerate(spectra_list):
-        y_norm = normalize_spectrum(energy, spectrum, pre_edge_offset=pre_edge_offset,
-                                    post_edge_offset=pre_edge_offset,
-                                    whiteline_range=whiteline_range)
+        y_norm = normalize(energy, spectrum, pre_edge_offset=pre_edge_offset,
+                           post_edge_offset=pre_edge_offset,
+                           whiteline_range=whiteline_range,
+                           whiteline_mode=whiteline_mode)
         normalized_spectra.append(y_norm)
     normalized_spectra = np.array(normalized_spectra)
 
@@ -534,7 +597,7 @@ def show_PCs(energy, pca, n=4, colors=None, alpha=0.6):
         if i + 1 == n:
             break
 
-    axes[0].legend(fontsize=16, loc='center right')
+    axes[0].legend(fontsize=16, loc=1, frameon=False)
     axes[1].legend(fontsize=16, bbox_to_anchor=(1, 0.5), loc='center left')
     for ax in axes:
         ax.tick_params(direction='in', width=2, length=6, labelsize=14)
@@ -1474,8 +1537,9 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     alphas = alphas - np.min(alphas)
     alphas = alphas / np.max(alphas)
 
-    axes[2].scatter(pts[:, 1], -pts[:, 0], c=pred_colors, s=2, alpha=alphas[:,  -1])
-    axes[2].set_title('LASSO LCF', fontsize=19)
+    if len(axes) != 3:
+        axes[2].scatter(pts[:, 1], -pts[:, 0], c=pred_colors, s=2, alpha=alphas[:,  -1])
+        axes[2].set_title('LASSO LCF', fontsize=19)
 
     #plot expected results
     color_labels = [6, 13, 12, 19]
@@ -1486,13 +1550,17 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
 
     expected_colors = np.array([plt.cm.tab20(color_labels[c])
                                 for c in concentrations[:, -1]])
-    axes[3].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -1])
-    axes[3].set_title('1st Expected Conc', fontsize=18)
+    if len(axes) != 3:
+        axes[3].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -1])
+        axes[3].set_title('1st Expected Conc', fontsize=18)
 
-    expected_colors = np.array([plt.cm.tab20(color_labels[c])
-                                for c in concentrations[:, -2]])
-    axes[4].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -2])
-    axes[4].set_title('2nd Expected Conc', fontsize=18)
+        expected_colors = np.array([plt.cm.tab20(color_labels[c])
+                                    for c in concentrations[:, -2]])
+        axes[4].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -2])
+        axes[4].set_title('2nd Expected Conc', fontsize=18)
+    else:
+        axes[2].scatter(pts[:, 1], -pts[:, 0], color=expected_colors, s=2, alpha=alphas[:, -1])
+        axes[2].set_title('Expected Phases', fontsize=18)
     
 
     # add legends
@@ -1501,7 +1569,11 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     colors = [plt.cm.tab20(c) for c in color_labels]
     patches = [mpatches.Patch(color=plt.cm.tab20(color_labels[i]),
                label=labels[i]) for i in range(len(labels))]
-    for ax in [axes[2], axes[3], axes[4]]:
+    if len(axes) != 3:
+        axlist = [axes[2], axes[3], axes[4]]
+    else:
+        axlist = [axes[2]]
+    for ax in axlist:
         leg = ax.legend(handles=patches, fontsize=18, ncol=2, framealpha=0,
                         handlelength=.6, loc=1, bbox_to_anchor=(1.06, 1.04),
                         labelspacing=.1, handletextpad=0.12, columnspacing=0.25)
