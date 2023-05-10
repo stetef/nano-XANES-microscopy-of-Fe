@@ -400,7 +400,7 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
 
 
 def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
-              post_edge_offset=10, whiteline_range=10):
+              post_edge_offset=10, whiteline_range=10, verbose=False):
     
     if whiteline_mode == 'gradient':
         whiteline = np.argmax(np.gradient(spectrum[:whiteline_range]))
@@ -418,7 +418,7 @@ def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
         else:
             e_post = energy[whiteline + post_edge_offset:].reshape(-1, 1)
             y_post = spectrum[whiteline + post_edge_offset:].reshape(-1, 1)
-            
+
         reg_post = LinearRegression().fit(e_post, y_post)
 
         post_edge = energy[whiteline:].reshape(-1, 1)
@@ -438,6 +438,14 @@ def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
         y_fit_pre = reg_pre.predict(energy.reshape(-1, 1)).reshape(-1)
     
     y_norm = y_norm - y_fit_pre
+
+    # post_edge_fit = reg_post.predict(energy.reshape(-1, 1)).reshape(-1)
+    # y_norm = y_norm / post_edge_fit
+
+    # if verbose:
+    #     return whiteline, y_fit_pre.reshape(-1), post_edge_fit.reshape(-1), y_norm
+    # else:
+    #     return y_norm
 
     line = y_fit_post.reshape(-1) 
     y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
@@ -488,11 +496,10 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=F
             post = int(post_edge_offset[i])
         else:
             post = post_edge_offset
-        whiteline, y_fit_pre, y_fit_post, y_norm = normalize_spectrum(energy, spectrum,
-                                                                      pre_edge_offset=pre,
-                                                                      post_edge_offset=post,
-                                                                      whiteline_range=whiteline_range,
-                                                                      verbose=True)
+        whiteline, y_fit_pre, y_fit_post, y_norm = normalize(energy, spectrum, verbose=True,
+                                                             pre_edge_offset=pre,
+                                                             post_edge_offset=post,
+                                                             whiteline_range=whiteline_range)
         pre_edge_fits.append(y_fit_pre)
         post_edge_fits.append(y_fit_post)
         whitelines.append(whiteline)
@@ -503,9 +510,14 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=F
             ax.plot(energy, spectrum, color=colors[0])  # raw spectrum
             ax.plot(energy[whiteline], spectrum[whiteline],
                     's', c='k', markersize=10, fillstyle='none')  # whiteline
-            ax.plot(energy[whiteline + post_edge_offset:],  # post highlight
-                    spectrum[whiteline + post_edge_offset:], '-', c=colors[1])
-            ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)  # fit line
+            if post_edge_offset < 0:
+                ax.plot(energy[post_edge_offset:],  # post highlight
+                        spectrum[post_edge_offset:], '-', c=colors[1])
+            else:
+                ax.plot(energy[whiteline + post_edge_offset:],  # post highlight
+                        spectrum[whiteline + post_edge_offset:], '-', c=colors[1])
+            #ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)  # post edge fit line
+            ax.plot(energy, y_fit_post, 'k-', linewidth=1)  # post edge fit line
             if pre_edge_offset == 'none':
                 ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
             else:
@@ -1424,9 +1436,9 @@ def get_reduced_space(normalized_spectra, data_dict, xrf_strength=0, xrf=None, s
     pca_components = pca.fit_transform(normalized_spectra)
 
     # spatial encoding
-    pts = np.array(list(data_dict.keys()))
-    w, h = 155, 160
     if spatial_strength != 0:
+        pts = np.array(list(data_dict.keys()))
+        w, h = 155, 160
         input_space = np.zeros((pca_components.shape[0], pca_components.shape[1] + 2))
         input_space[:, :pca_components.shape[1]] = pca_components.copy()
         input_space[:, -2] = pts[:, 0] / w * spatial_strength
