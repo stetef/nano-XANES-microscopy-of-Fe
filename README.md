@@ -3,7 +3,7 @@ Analysis of nanoscale XANES (nano-XANES) microscopy images of Fe K-edge. Data ta
 
 Supplementary Fe 2p STXM data taken at the Advanced Light Source, beamline 11.0.2.2. Data courtesy of Brandy Toner and Matthew Marcus.
 
-## The dataset
+## Data
 
 Every pixel (150 nm) in this image is an Fe K-edge XANES spectrum. There are about 25,000 spectra in this image.
 
@@ -13,11 +13,11 @@ Every pixel (150 nm) in this image is an Fe K-edge XANES spectrum. There are abo
 
 ## Manifold Projection Image Segmentation (MPIS)
 
-We introduce an analysis pipeline for nano-XANES imaging that first performs image segmentation (identifyging domains in the image that are similar) before identifying the identity of those domains via the standard linear combination fitting procedure (LCF) onto a reference library. We call this pipeline Manifold Projection Image Segmentation (MPIS). MPIS has three main benefits:
+We introduce an analysis pipeline for nano-XANES imaging that first performs image segmentation (identifyging domains in the image that are similar) before identifying the composition of those domains, which is usually done via linear combination fitting (LCF) onto a reference library. We call this pipeline Manifold Projection Image Segmentation (MPIS). MPIS has three main benefits.
 
 1. MPIS decouples the idenitification of domains from linear combination fitting analysis, which removes dependence on an appropriate reference library and does not propogate errors from the linear combination fitting algorithm.
-2. MPIS can encode auxiliary information (such as spatial location of each pixel and mulitmodal spectroscopies like X-ray fluorescence to identify elemental composition) into the image segmentation pipeline.
-3. MPIS is more robust to noise in the spectra; it intelligentally averages spectra together rather than losing spatial resolution when Gaussian blurring the image.
+2. MPIS can encode auxiliary information (such as spatial location of each pixel and mulitmodal spectroscopies like X-ray fluorescence) into the image segmentation pipeline.
+3. MPIS is more robust to noise in the spectra; it intelligentally averages spectra together rather than losing spatial resolution as with Gaussian blurring the image.
 
 <p align="center">
 <img src="Figures/image_segmentation.png" alt="MPIS" width="400">
