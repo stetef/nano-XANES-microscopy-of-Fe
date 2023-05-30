@@ -1,0 +1,193 @@
+
+ScanDefinition = { Label = "71214078.hdr"; Type = "NEXAFS Image Scan"; Flags = "Image Stack"; Dwell = 0.433;
+	Regions = (1,
+{
+			PAxis = { Name = "Sample X"; Unit = "um"; Min = -4736.602; Max = -4726.602; Dir = 1;
+				Points = (125, -4736.602, -4736.522, -4736.442, -4736.362, -4736.282, -4736.202, -4736.122, -4736.042, -4735.962, -4735.882, -4735.802, -4735.722, -4735.642, -4735.562, -4735.482, -4735.402, -4735.322, -4735.242, -4735.162, -4735.082, -4735.002, -4734.922, -4734.842, -4734.762, -4734.682, -4734.602, -4734.522, -4734.442, -4734.362, -4734.282, -4734.202, -4734.122, -4734.042, -4733.962, -4733.882, -4733.802, -4733.722, -4733.642, -4733.562, -4733.482, -4733.402, -4733.322, -4733.242, -4733.162, -4733.082, -4733.002, -4732.922, -4732.842, -4732.762, -4732.682, -4732.602, -4732.522, -4732.442, -4732.362, -4732.282, -4732.202, -4732.122, -4732.042, -4731.962, -4731.882, -4731.802, -4731.722, -4731.642, -4731.562, -4731.482, -4731.402, -4731.322, -4731.242, -4731.162, -4731.082, -4731.002, -4730.922, -4730.842, -4730.762, -4730.682, -4730.602, -4730.522, -4730.442, -4730.362, -4730.282, -4730.202, -4730.122, -4730.042, -4729.962, -4729.882, -4729.802, -4729.722, -4729.642, -4729.562, -4729.482, -4729.402, -4729.322, -4729.242, -4729.162, -4729.082, -4729.002, -4728.922, -4728.842, -4728.762, -4728.682, -4728.602, -4728.522, -4728.442, -4728.362, -4728.282, -4728.202, -4728.122, -4728.042, -4727.962, -4727.882, -4727.802, -4727.722, -4727.642, -4727.562, -4727.482, -4727.402, -4727.322, -4727.242, -4727.162, -4727.082, -4727.002, -4726.922, -4726.842, -4726.762, -4726.682);
+};
+
+			QAxis = { Name = "Sample Y"; Unit = "um"; Min = -638.153; Max = -628.153; Dir = 1;
+				Points = (125, -638.153, -638.073, -637.993, -637.913, -637.833, -637.753, -637.673, -637.593, -637.513, -637.433, -637.353, -637.273, -637.193, -637.113, -637.033, -636.953, -636.873, -636.793, -636.713, -636.633, -636.553, -636.473, -636.393, -636.313, -636.233, -636.153, -636.073, -635.993, -635.913, -635.833, -635.753, -635.673, -635.593, -635.513, -635.433, -635.353, -635.273, -635.193, -635.113, -635.033, -634.953, -634.873, -634.793, -634.713, -634.633, -634.553, -634.473, -634.393, -634.313, -634.233, -634.153, -634.073, -633.993, -633.913, -633.833, -633.753, -633.673, -633.593, -633.513, -633.433, -633.353, -633.273, -633.193, -633.113, -633.033, -632.953, -632.873, -632.793, -632.713, -632.633, -632.553, -632.473, -632.393, -632.313, -632.233, -632.153, -632.073, -631.993, -631.913, -631.833, -631.753, -631.673, -631.593, -631.513, -631.433, -631.353, -631.273, -631.193, -631.113, -631.033, -630.953, -630.873, -630.793, -630.713, -630.633, -630.553, -630.473, -630.393, -630.313, -630.233, -630.153, -630.073, -629.993, -629.913, -629.833, -629.753, -629.673, -629.593, -629.513, -629.433, -629.353, -629.273, -629.193, -629.113, -629.033, -628.953, -628.873, -628.793, -628.713, -628.633, -628.553, -628.473, -628.393, -628.313, -628.233);
+};
+});
+
+	StackAxis = { Name = "Energy"; Unit = "eV"; Min = 700; Max = 730; Dir = 1;
+		Points = (123, 700.000, 700.375, 700.750, 701.125, 701.500, 701.875, 702.250, 702.625, 703.000, 703.202, 703.404, 703.606, 703.808, 704.010, 704.212, 704.414, 704.616, 704.818, 705.020, 705.222, 705.424, 705.626, 705.828, 706.030, 706.232, 706.434, 706.636, 706.838, 707.040, 707.242, 707.444, 707.646, 707.848, 708.050, 708.252, 708.454, 708.656, 708.858, 709.060, 709.262, 709.464, 709.666, 709.868, 710.070, 710.272, 710.474, 710.676, 710.878, 711.080, 711.282, 711.484, 711.686, 711.888, 712.090, 712.292, 712.494, 712.696, 712.898, 713.100, 713.302, 713.504, 713.706, 713.908, 714.110, 714.312, 714.514, 714.716, 714.918, 715.120, 715.322, 715.524, 715.726, 715.928, 716.130, 716.332, 716.534, 716.736, 716.938, 717.140, 717.342, 717.544, 717.746, 717.948, 718.150, 718.352, 718.554, 718.756, 718.958, 719.160, 719.362, 719.564, 719.766, 719.968, 720.170, 720.357, 720.714, 721.071, 721.428, 721.785, 722.142, 722.499, 722.856, 723.213, 723.570, 723.927, 724.284, 724.641, 724.998, 725.355, 725.712, 726.069, 726.426, 726.783, 727.140, 727.497, 727.854, 728.211, 728.568, 728.925, 729.282, 729.639, 729.996, 730.353);
+};
+
+	Channels = (1,
+{ Name = "counter1"; Unit = "counts";});
+};
+ Time = "2007 December 14 18:52:00"; BeamFeedback = true; ShutterAutomatic = true;
+Channels = (1,
+{ ID = 6; Type = 0; Name = "counter1"; Controller = 0; DeviceNumber = 1; UnitName = "counts"; LinearCoefficient = 1; ConstantCoefficient = 0; ProcessString = "Io";});
+
+Monochromator = { Name = "Energy"; LastPosition = 699.972; Status = 0; Type = 2; ControllerID = 64; Vel = 0;};
+
+EntranceSlit = { Name = "Micro Mirror Horz Deflection"; LastPosition = 0.071; Status = 1; Type = 2; ControllerID = 63; Vel = 200;};
+
+ExitVSlit = { Name = "Microscopy Slit Width"; LastPosition = 7.083; Status = 1; Type = 2; ControllerID = 62; Vel = 200;};
+
+ExitHSlit = { Name = "Microscopy Slit Height"; LastPosition = 4.917; Status = 1; Type = 2; ControllerID = 61; Vel = 200;};
+
+SampleFineX = { Name = "SampleX"; LastPosition = -4725.8639; Status = 0; Type = 0; ControllerID = 41; Vel = 5;};
+
+SampleFineY = { Name = "SampleY"; LastPosition = -638.14921; Status = 0; Type = 0; ControllerID = 42; Vel = 4;};
+
+SampleFineZ = { Name = "MagnField"; LastPosition = 0.0048840049; Status = 1; Type = 0; ControllerID = 3; Vel = 1;};
+
+SampleCoarseX = { Name = "CoarseX"; LastPosition = -4735.76; Status = 0; Type = 1; ControllerID = 81; Vel = 5;};
+
+SampleCoarseY = { Name = "CoarseY"; LastPosition = -643.053; Status = 1; Type = 1; ControllerID = 82; Vel = 1;};
+
+SampleCoarseZ = { Name = "CoarseZ"; LastPosition = 917; Status = 0; Type = 1; ControllerID = 34; Vel = 2;};
+
+ZonePlateZ = { Name = "ZonePlate"; LastPosition = -2603.167; Status = 0; Type = 3; ControllerID = 85; Vel = 5000;};
+
+OSAX = { Name = "OSAX"; LastPosition = -0.3; Status = 0; Type = 3; ControllerID = 86; Vel = 10000;};
+
+OSAY = { Name = "OSAY"; LastPosition = -0.1; Status = 0; Type = 3; ControllerID = 87; Vel = 10000;};
+
+DetectorX = { Name = "DetectorX"; LastPosition = 0; Status = 0; Type = 1; ControllerID = 35; Vel = 1;};
+
+DetectorY = { Name = "DetectorY"; LastPosition = 0; Status = 0; Type = 1; ControllerID = 36; Vel = 1;};
+
+DetectorZ = { Name = "Power"; LastPosition = 0; Status = 1; Type = 2; ControllerID = 0; Vel = 3;};
+
+AUX1 = { Name = "M201 Horz Deflection"; LastPosition = 0.76; Status = 1; Type = 2; ControllerID = 68; Vel = 3;};
+
+AUX2 = { Name = "FREQ"; LastPosition = 66.7; Status = 1; Type = 2; ControllerID = 0; Vel = 3;};
+
+EPUGap = { Name = "EPU Gap"; LastPosition = 25.326; Status = 1; Type = 2; ControllerID = 66; Vel = 200;};
+ StorageRingCurrent = 333.4; EPUPhase = 0; Polarization = 0; PMT_CounterDivider = 10;
+ImageScan = { ScanType = "Image (Line - unidirection)"; Stage = "Automatic"; Shutter = "Automatic"; Interferometry = "On"; SingleEnergy = false;
+	EnergyRegions = (3,
+{ StartEnergy = 700; EndEnergy = 703; Range = 3; Step = 0.375; Points = 9; DwellTime = 0.433;},
+{ StartEnergy = 703; EndEnergy = 720; Range = 17; Step = 0.202; Points = 85; DwellTime = 0.433;},
+{ StartEnergy = 720; EndEnergy = 730; Range = 10; Step = 0.357; Points = 29; DwellTime = 0.433;});
+ PointDelay = 0.02165; LineDelay = 20; AccelDist = 0.737; MultipleRegions = false;
+	SpatialRegions = (1,
+{ CentreXPos = -4731.602; CentreYPos = -633.153; XRange = 10; YRange = 10; XStep = 0.08; YStep = 0.08; XPoints = 125; YPoints = 125; SquareRegion = false; SquarePixels = false;});
+};
+Image2 = {StorageRingCurrent = 333.08; Time = "2007 December 14 18:52:26";};
+Image3 = {StorageRingCurrent = 332.80; Time = "2007 December 14 18:52:49";};
+Image4 = {StorageRingCurrent = 332.65; Time = "2007 December 14 18:53:12";};
+Image5 = {StorageRingCurrent = 332.41; Time = "2007 December 14 18:53:35";};
+Image6 = {StorageRingCurrent = 332.16; Time = "2007 December 14 18:53:58";};
+Image7 = {StorageRingCurrent = 331.92; Time = "2007 December 14 18:54:20";};
+Image8 = {StorageRingCurrent = 331.68; Time = "2007 December 14 18:54:43";};
+Image9 = {StorageRingCurrent = 331.40; Time = "2007 December 14 18:55:07";};
+Image10 = {StorageRingCurrent = 331.25; Time = "2007 December 14 18:55:30";};
+Image11 = {StorageRingCurrent = 331.00; Time = "2007 December 14 18:55:52";};
+Image12 = {StorageRingCurrent = 330.76; Time = "2007 December 14 18:56:17";};
+Image13 = {StorageRingCurrent = 330.48; Time = "2007 December 14 18:56:40";};
+Image14 = {StorageRingCurrent = 330.24; Time = "2007 December 14 18:57:03";};
+Image15 = {StorageRingCurrent = 330.03; Time = "2007 December 14 18:57:26";};
+Image16 = {StorageRingCurrent = 329.81; Time = "2007 December 14 18:57:49";};
+Image17 = {StorageRingCurrent = 329.57; Time = "2007 December 14 18:58:12";};
+Image18 = {StorageRingCurrent = 329.33; Time = "2007 December 14 18:58:34";};
+Image19 = {StorageRingCurrent = 329.11; Time = "2007 December 14 18:58:57";};
+Image20 = {StorageRingCurrent = 328.93; Time = "2007 December 14 18:59:23";};
+Image21 = {StorageRingCurrent = 328.62; Time = "2007 December 14 18:59:45";};
+Image22 = {StorageRingCurrent = 328.41; Time = "2007 December 14 19:00:08";};
+Image23 = {StorageRingCurrent = 328.14; Time = "2007 December 14 19:00:31";};
+Image24 = {StorageRingCurrent = 327.92; Time = "2007 December 14 19:00:54";};
+Image25 = {StorageRingCurrent = 327.71; Time = "2007 December 14 19:01:17";};
+Image26 = {StorageRingCurrent = 327.49; Time = "2007 December 14 19:01:40";};
+Image27 = {StorageRingCurrent = 327.25; Time = "2007 December 14 19:02:03";};
+Image28 = {StorageRingCurrent = 327.07; Time = "2007 December 14 19:02:25";};
+Image29 = {StorageRingCurrent = 326.85; Time = "2007 December 14 19:02:48";};
+Image30 = {StorageRingCurrent = 326.61; Time = "2007 December 14 19:03:13";};
+Image31 = {StorageRingCurrent = 326.30; Time = "2007 December 14 19:03:36";};
+Image32 = {StorageRingCurrent = 326.12; Time = "2007 December 14 19:03:59";};
+Image33 = {StorageRingCurrent = 325.91; Time = "2007 December 14 19:04:22";};
+Image34 = {StorageRingCurrent = 325.66; Time = "2007 December 14 19:04:45";};
+Image35 = {StorageRingCurrent = 325.48; Time = "2007 December 14 19:05:07";};
+Image36 = {StorageRingCurrent = 325.24; Time = "2007 December 14 19:05:30";};
+Image37 = {StorageRingCurrent = 324.99; Time = "2007 December 14 19:05:53";};
+Image38 = {StorageRingCurrent = 324.75; Time = "2007 December 14 19:06:16";};
+Image39 = {StorageRingCurrent = 324.56; Time = "2007 December 14 19:06:39";};
+Image40 = {StorageRingCurrent = 324.32; Time = "2007 December 14 19:07:02";};
+Image41 = {StorageRingCurrent = 324.08; Time = "2007 December 14 19:07:24";};
+Image42 = {StorageRingCurrent = 323.92; Time = "2007 December 14 19:07:47";};
+Image43 = {StorageRingCurrent = 323.71; Time = "2007 December 14 19:08:10";};
+Image44 = {StorageRingCurrent = 323.47; Time = "2007 December 14 19:08:33";};
+Image45 = {StorageRingCurrent = 323.22; Time = "2007 December 14 19:08:56";};
+Image46 = {StorageRingCurrent = 323.01; Time = "2007 December 14 19:09:19";};
+Image47 = {StorageRingCurrent = 322.79; Time = "2007 December 14 19:09:41";};
+Image48 = {StorageRingCurrent = 322.52; Time = "2007 December 14 19:10:04";};
+Image49 = {StorageRingCurrent = 322.34; Time = "2007 December 14 19:10:28";};
+Image50 = {StorageRingCurrent = 322.09; Time = "2007 December 14 19:10:51";};
+Image51 = {StorageRingCurrent = 321.88; Time = "2007 December 14 19:11:13";};
+Image52 = {StorageRingCurrent = 321.70; Time = "2007 December 14 19:11:39";};
+Image53 = {StorageRingCurrent = 321.42; Time = "2007 December 14 19:12:01";};
+Image54 = {StorageRingCurrent = 321.21; Time = "2007 December 14 19:12:24";};
+Image55 = {StorageRingCurrent = 321.02; Time = "2007 December 14 19:12:47";};
+Image56 = {StorageRingCurrent = 320.78; Time = "2007 December 14 19:13:10";};
+Image57 = {StorageRingCurrent = 320.60; Time = "2007 December 14 19:13:33";};
+Image58 = {StorageRingCurrent = 320.35; Time = "2007 December 14 19:13:55";};
+Image59 = {StorageRingCurrent = 320.20; Time = "2007 December 14 19:14:19";};
+Image60 = {StorageRingCurrent = 319.93; Time = "2007 December 14 19:14:44";};
+Image61 = {StorageRingCurrent = 319.68; Time = "2007 December 14 19:15:07";};
+Image62 = {StorageRingCurrent = 319.47; Time = "2007 December 14 19:15:32";};
+Image63 = {StorageRingCurrent = 319.16; Time = "2007 December 14 19:15:56";};
+Image64 = {StorageRingCurrent = 318.95; Time = "2007 December 14 19:16:19";};
+Image65 = {StorageRingCurrent = 318.74; Time = "2007 December 14 19:16:42";};
+Image66 = {StorageRingCurrent = 318.58; Time = "2007 December 14 19:17:05";};
+Image67 = {StorageRingCurrent = 318.34; Time = "2007 December 14 19:17:27";};
+Image68 = {StorageRingCurrent = 318.06; Time = "2007 December 14 19:17:50";};
+Image69 = {StorageRingCurrent = 317.85; Time = "2007 December 14 19:18:14";};
+Image70 = {StorageRingCurrent = 317.64; Time = "2007 December 14 19:18:37";};
+Image71 = {StorageRingCurrent = 317.45; Time = "2007 December 14 19:19:00";};
+Image72 = {StorageRingCurrent = 317.24; Time = "2007 December 14 19:19:22";};
+Image73 = {StorageRingCurrent = 317.00; Time = "2007 December 14 19:19:45";};
+Image74 = {StorageRingCurrent = 316.78; Time = "2007 December 14 19:20:08";};
+Image75 = {StorageRingCurrent = 316.63; Time = "2007 December 14 19:20:31";};
+Image76 = {StorageRingCurrent = 316.35; Time = "2007 December 14 19:20:56";};
+Image77 = {StorageRingCurrent = 316.14; Time = "2007 December 14 19:21:19";};
+Image78 = {StorageRingCurrent = 315.90; Time = "2007 December 14 19:21:42";};
+Image79 = {StorageRingCurrent = 315.68; Time = "2007 December 14 19:22:05";};
+Image80 = {StorageRingCurrent = 315.56; Time = "2007 December 14 19:22:28";};
+Image81 = {StorageRingCurrent = 315.26; Time = "2007 December 14 19:22:50";};
+Image82 = {StorageRingCurrent = 315.04; Time = "2007 December 14 19:23:13";};
+Image83 = {StorageRingCurrent = 314.83; Time = "2007 December 14 19:23:38";};
+Image84 = {StorageRingCurrent = 314.62; Time = "2007 December 14 19:24:01";};
+Image85 = {StorageRingCurrent = 314.40; Time = "2007 December 14 19:24:24";};
+Image86 = {StorageRingCurrent = 314.22; Time = "2007 December 14 19:24:47";};
+Image87 = {StorageRingCurrent = 313.94; Time = "2007 December 14 19:25:12";};
+Image88 = {StorageRingCurrent = 313.76; Time = "2007 December 14 19:25:36";};
+Image89 = {StorageRingCurrent = 313.55; Time = "2007 December 14 19:26:01";};
+Image90 = {StorageRingCurrent = 313.24; Time = "2007 December 14 19:26:24";};
+Image91 = {StorageRingCurrent = 313.06; Time = "2007 December 14 19:26:47";};
+Image92 = {StorageRingCurrent = 312.81; Time = "2007 December 14 19:27:12";};
+Image93 = {StorageRingCurrent = 312.63; Time = "2007 December 14 19:27:35";};
+Image94 = {StorageRingCurrent = 312.36; Time = "2007 December 14 19:27:58";};
+Image95 = {StorageRingCurrent = 312.17; Time = "2007 December 14 19:28:23";};
+Image96 = {StorageRingCurrent = 311.96; Time = "2007 December 14 19:28:46";};
+Image97 = {StorageRingCurrent = 311.75; Time = "2007 December 14 19:29:09";};
+Image98 = {StorageRingCurrent = 311.59; Time = "2007 December 14 19:29:32";};
+Image99 = {StorageRingCurrent = 311.35; Time = "2007 December 14 19:29:55";};
+Image100 = {StorageRingCurrent = 311.08; Time = "2007 December 14 19:30:21";};
+Image101 = {StorageRingCurrent = 310.92; Time = "2007 December 14 19:30:44";};
+Image102 = {StorageRingCurrent = 310.68; Time = "2007 December 14 19:31:07";};
+Image103 = {StorageRingCurrent = 310.53; Time = "2007 December 14 19:31:29";};
+Image104 = {StorageRingCurrent = 310.28; Time = "2007 December 14 19:31:52";};
+Image105 = {StorageRingCurrent = 310.07; Time = "2007 December 14 19:32:15";};
+Image106 = {StorageRingCurrent = 309.82; Time = "2007 December 14 19:32:38";};
+Image107 = {StorageRingCurrent = 309.67; Time = "2007 December 14 19:33:01";};
+Image108 = {StorageRingCurrent = 309.49; Time = "2007 December 14 19:33:24";};
+Image109 = {StorageRingCurrent = 309.27; Time = "2007 December 14 19:33:47";};
+Image110 = {StorageRingCurrent = 309.03; Time = "2007 December 14 19:34:09";};
+Image111 = {StorageRingCurrent = 308.82; Time = "2007 December 14 19:34:32";};
+Image112 = {StorageRingCurrent = 308.66; Time = "2007 December 14 19:34:55";};
+Image113 = {StorageRingCurrent = 308.42; Time = "2007 December 14 19:35:18";};
+Image114 = {StorageRingCurrent = 308.24; Time = "2007 December 14 19:35:41";};
+Image115 = {StorageRingCurrent = 307.99; Time = "2007 December 14 19:36:04";};
+Image116 = {StorageRingCurrent = 307.84; Time = "2007 December 14 19:36:29";};
+Image117 = {StorageRingCurrent = 307.60; Time = "2007 December 14 19:36:52";};
+Image118 = {StorageRingCurrent = 307.38; Time = "2007 December 14 19:37:15";};
+Image119 = {StorageRingCurrent = 307.20; Time = "2007 December 14 19:37:37";};
+Image120 = {StorageRingCurrent = 306.96; Time = "2007 December 14 19:38:00";};
+Image121 = {StorageRingCurrent = 306.77; Time = "2007 December 14 19:38:23";};
+Image122 = {StorageRingCurrent = 306.59; Time = "2007 December 14 19:38:46";};
+Image123 = {StorageRingCurrent = 306.38; Time = "2007 December 14 19:39:09";};

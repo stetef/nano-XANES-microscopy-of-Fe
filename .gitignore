@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Project Files
+Data/ALS_Toner/71214078_FigS4/Tica22Reg3b.sp
+Data/ALS_Toner/71214098_FigS3/Tica22Reg4.sp
