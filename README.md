@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/511645686.svg)](https://zenodo.org/badge/latestdoi/511645686)
+
 # nano-XANES-microscopy-of-Fe
 Analysis of nanoscale XANES (nano-XANES) microscopy images of Fe K-edge. Data taken at the 3-ID Hard X-ray Nanoprobe (HXN) beamline at Brookhaven National Laboratory. Data courtesy of Ajith Pattamattel and Yong Chu.
 
