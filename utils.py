@@ -400,7 +400,7 @@ def normalize_spectrum(energy, spectrum, verbose=False, pre_edge_offset=20,
 
 
 def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
-              post_edge_offset=10, whiteline_range=10, verbose=False):
+              post_edge_offset=10, whiteline_range=10, verbose=False, return_fits=False):
     
     if whiteline_mode == 'gradient':
         whiteline = np.argmax(np.gradient(spectrum[:whiteline_range]))
@@ -439,14 +439,6 @@ def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
     
     y_norm = y_norm - y_fit_pre
 
-    # post_edge_fit = reg_post.predict(energy.reshape(-1, 1)).reshape(-1)
-    # y_norm = y_norm / post_edge_fit
-
-    # if verbose:
-    #     return whiteline, y_fit_pre.reshape(-1), post_edge_fit.reshape(-1), y_norm
-    # else:
-    #     return y_norm
-
     line = y_fit_post.reshape(-1) 
     y_norm[whiteline:] = y_norm[whiteline:] - line + line[0]
     
@@ -455,7 +447,10 @@ def normalize(energy, spectrum, pre_edge_offset=20, whiteline_mode='gradient',
     else:
         y_norm = y_norm / (line[0] - y_fit_pre[whiteline])
 
-    return y_norm
+    if return_fits:
+    	return y_norm, y_fit_pre, y_fit_post, whiteline
+    else:
+    	return y_norm
 
 
 def normalize_spectra(energy, spectra_list, spectra_dict, whiteline_range=10,
@@ -477,16 +472,12 @@ def normalize_spectra(energy, spectra_list, spectra_dict, whiteline_range=10,
 
 
 def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=False,
-                       plot=True, pre_edge_offset=20, post_edge_offset=10,
+                       pre_edge_offset=20, post_edge_offset=10,
                        whiteline_range=10, colors=[plt.cm.tab10(0), plt.cm.tab10(1)]):
-    if plot:
-        fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
-        plt.subplots_adjust(wspace=0.2, hspace=0)
+    
+    fig, axes = plt.subplots(figsize=(8, 2 * N), ncols=2, nrows=N)
+    plt.subplots_adjust(wspace=0.2, hspace=0)
 
-    pre_edge_fits = []
-    post_edge_fits = []
-    whitelines = []
-    y_norms = []
     for i, spectrum in enumerate(filtered_spectra[start_i:]):
         if type(pre_edge_offset) is list:
             pre = pre_edge_offset[i]
@@ -496,54 +487,42 @@ def show_normalization(energy, filtered_spectra, N=5, start_i=0, return_params=F
             post = int(post_edge_offset[i])
         else:
             post = post_edge_offset
-        whiteline, y_fit_pre, y_fit_post, y_norm = normalize(energy, spectrum, verbose=True,
-                                                             pre_edge_offset=pre,
-                                                             post_edge_offset=post,
-                                                             whiteline_range=whiteline_range)
-        pre_edge_fits.append(y_fit_pre)
-        post_edge_fits.append(y_fit_post)
-        whitelines.append(whiteline)
-        y_norms.append(y_norm)
-
-        if plot:
-            ax = axes[i, 0]
-            ax.plot(energy, spectrum, color=colors[0])  # raw spectrum
-            ax.plot(energy[whiteline], spectrum[whiteline],
-                    's', c='k', markersize=10, fillstyle='none')  # whiteline
-            if post_edge_offset < 0:
-                ax.plot(energy[post_edge_offset:],  # post highlight
-                        spectrum[post_edge_offset:], '-', c=colors[1])
-            else:
-                ax.plot(energy[whiteline + post_edge_offset:],  # post highlight
-                        spectrum[whiteline + post_edge_offset:], '-', c=colors[1])
-            #ax.plot(energy[whiteline:], y_fit_post, 'k-', linewidth=1)  # post edge fit line
-            ax.plot(energy, y_fit_post, 'k-', linewidth=1)  # post edge fit line
-            if pre_edge_offset == 'none':
-                ax.plot(energy, np.ones(len(energy)) * y_fit_pre, 'k--', linewidth=1)
-            else:
-                ax.plot(energy, y_fit_pre, 'k--', linewidth=1)
-
-            ax = axes[i, 1]
-            ax.plot(energy, y_norm, color=colors[0])
-
-            for ax in axes[i]:
-                ax.set_xlabel('Energy (eV)', fontsize=16)
-                ax.tick_params(direction='out', width=2, length=6, labelsize=14)
-                ax.tick_params(rotation=30, axis='x')
-                ax.grid(axis='x')
-                ax.xaxis.set_major_locator(MultipleLocator(20))
-                if i != N - 1:
-                    ax.set_xlabel(None)
-                    ax.xaxis.set_ticklabels([])
-                    ax.xaxis.set_ticks_position('none')  
-
+        y_norm, y_pre, y_post, whiteline = normalize(energy, spectrum, verbose=True,
+                           					         pre_edge_offset=pre,
+					                                 post_edge_offset=post,
+					                                 whiteline_range=whiteline_range,
+					                                 return_fits=True)
+        ax = axes[i, 0]
+        ax.plot(energy, spectrum, color=colors[0])  # raw spectrum
+        ax.plot(energy[whiteline], spectrum[whiteline],
+                's', c='k', markersize=10, fillstyle='none')  # whiteline
+        if post_edge_offset < 0:
+            ax.plot(energy[post_edge_offset:],  # post highlight
+                    spectrum[post_edge_offset:], '-', c=colors[1])
+        else:
+            ax.plot(energy[whiteline + post_edge_offset:],  # post highlight
+                    spectrum[whiteline + post_edge_offset:], '-', c=colors[1])
+        ax.plot(energy[whiteline:], y_post, 'k-', linewidth=1)  # post edge fit line
+        if pre_edge_offset == 'none':
+            ax.plot(energy, np.ones(len(energy)) * y_pre, 'k--', linewidth=1)
+        else:
+            ax.plot(energy, y_pre, 'k--', linewidth=1)
+        ax = axes[i, 1]
+        ax.plot(energy, y_norm, color=colors[0])
+        for ax in axes[i]:
+            ax.set_xlabel('Energy (eV)', fontsize=16)
+            ax.tick_params(direction='out', width=2, length=6, labelsize=14)
+            ax.tick_params(rotation=30, axis='x')
+            ax.grid(axis='x')
+            ax.xaxis.set_major_locator(MultipleLocator(20))
+            if i != N - 1:
+                ax.set_xlabel(None)
+                ax.xaxis.set_ticklabels([])
+                ax.xaxis.set_ticks_position('none')  
         if i == N - 1:
             break
-            
-    if return_params:
-        return np.array(pre_edge_fits), post_edge_fits, np.array(whitelines)
-    elif plot:
-        return fig, axes
+
+    plt.show()
 
 
 def make_PCA_triangle_plot(data, n_components, cmap=plt.cm.gnuplot,
@@ -1475,7 +1454,7 @@ def get_reduced_space(normalized_spectra, data_dict, xrf_strength=0, xrf=None, s
 def apply_clustering(reduced_space, clustering, data_dict, translation=-1, n_clusters=4, eps=1):
     # clustering
     if clustering == 'k-means':
-        clusterizer = KMeans(n_clusters=n_clusters, random_state=42).fit(reduced_space)
+        clusterizer = KMeans(n_clusters=n_clusters, random_state=42, n_init='auto').fit(reduced_space)
     elif clustering == 'dbscan':
         clusterizer = DBSCAN(eps=eps, min_samples=1).fit(reduced_space)
         print(f"Couldn't cluster {np.sum(clusterizer.labels_ == -1)} points")
