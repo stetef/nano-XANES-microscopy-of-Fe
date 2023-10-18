@@ -1,0 +1,8 @@
+matplotlib==3.7.0
+mplcursors==0.5.2
+numpy==1.23.5
+pandas==1.5.3
+Pillow==9.4.0
+scikit_learn==1.2.1
+scipy==1.10.0
+umap_learn==0.5.3

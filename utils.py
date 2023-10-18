@@ -2,23 +2,32 @@
 
 import numpy as np
 import itertools
+import pandas as pd
+import os
+
+import selector
+from selector import energy_point_selector
+import timeit, time
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import mplcursors
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MultipleLocator
-import matplotlib.patches as mpatches
 from matplotlib.offsetbox import AnchoredOffsetbox, TextArea
 from matplotlib.offsetbox import HPacker, VPacker, AnnotationBbox
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib import gridspec
+import matplotlib.patches as patches
 
 from PIL import Image, ImageSequence
 
 from scipy.optimize import minimize
 from scipy.stats import pearsonr
 from scipy.stats import norm
+from scipy.interpolate import interp1d
+from scipy.stats import wasserstein_distance, pearsonr
+from scipy.optimize import nnls
 
 from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN
@@ -28,19 +37,12 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
-
-from scipy.interpolate import interp1d
-from scipy.stats import wasserstein_distance, pearsonr
-
-import sympy
-
 from sklearn.model_selection import cross_val_score, RepeatedKFold
 from sklearn.linear_model import MultiTaskElasticNetCV
-from scipy.optimize import nnls
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import ElasticNetCV
-
-from joblib import dump, load
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
 
 import umap
 
@@ -299,7 +301,7 @@ def plot_expected_results(expected_results, ax):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    patches = [mpatches.Patch(color=plt.cm.tab20(color_labels[i]),
+    patches = [patches.Patch(color=plt.cm.tab20(color_labels[i]),
                               label=labels[i]) for i in range(len(labels))]
     leg = ax.legend(handles=patches, fontsize=18, ncol=2, framealpha=0, handlelength=1., loc=1,
                     handletextpad=0.25, columnspacing=0.7, bbox_to_anchor=(1.05, 1.03))
@@ -1558,7 +1560,7 @@ def two_dimensional_clustering(plot, normalized_spectra, data_dict, Refs, xrf_st
     labels = ['LFP', 'Pyr', 'SS', 'Hem']
     color_labels = [12, 13, 6, 19]
     colors = [plt.cm.tab20(c) for c in color_labels]
-    patches = [mpatches.Patch(color=plt.cm.tab20(color_labels[i]),
+    patches = [patches.Patch(color=plt.cm.tab20(color_labels[i]),
                label=labels[i]) for i in range(len(labels))]
     if len(axes) != 3:
         axlist = [axes[2], axes[3], axes[4]]

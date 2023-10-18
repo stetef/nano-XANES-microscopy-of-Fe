@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="137.98332mm"
-   height="100.94166mm"
-   viewBox="0 0 137.98332 100.94166"
+   width="133.00092mm"
+   height="165.10175mm"
+   viewBox="0 0 133.00091 165.10175"
    version="1.1"
    id="svg8"
    inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
@@ -20,6 +20,39 @@
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect834"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect828"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect822"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient1077">
@@ -97,12 +130,23 @@
        inkscape:collect="always"
        xlink:href="#linearGradient1077"
        id="linearGradient1079"
-       x1="82.020834"
+       x1="82.020836"
        y1="248.70834"
        x2="124.38657"
        y2="248.44055"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(-1.355324,1.5906957)" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect984-9"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -111,9 +155,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="290.97443"
-     inkscape:cy="232.99168"
+     inkscape:zoom="0.47656797"
+     inkscape:cx="494.15826"
+     inkscape:cy="324.193"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -130,8 +174,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid835"
-       originx="-26.258333"
-       originy="-227.34168" />
+       originx="-25.348655"
+       originy="-172.19703" />
   </sodipodi:namedview>
   <metadata
      id="metadata5">
@@ -149,7 +193,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-26.258334,-227.34167)">
+     transform="translate(-25.348658,-172.19702)">
     <rect
        style="fill:#7872b3;fill-opacity:0.960784;fill-rule:evenodd;stroke:none;stroke-width:0.56852;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1093-83-2"
@@ -165,7 +209,7 @@
        x="95.414665"
        y="320.19131" />
     <rect
-       style="fill:#7872b3;fill-opacity:0.96078432;fill-rule:evenodd;stroke:none;stroke-width:0.56852;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:markers fill stroke"
+       style="fill:#7872b3;fill-opacity:0.960784;fill-rule:evenodd;stroke:none;stroke-width:0.56852;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1093-83"
        width="13.229166"
        height="4.0086379"
@@ -207,21 +251,21 @@
        x="42.333332"
        y="304.23093" />
     <path
-       style="fill:url(#linearGradient1079);fill-opacity:1;stroke:none;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 80.66551,241.03861 v 18.52084 l 30.45949,-0.26779 v 5.29166 l 14.55208,-14.55208 -14.55208,-14.55208 0,5.29166 z"
+       style="fill:url(#linearGradient1079);fill-opacity:1;stroke:none;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 80.66551,241.03861 v 18.52084 l 30.45949,-0.26779 v 5.29166 L 125.67708,250.03124 111.125,235.47916 v 5.29166 z"
        id="path975"
        sodipodi:nodetypes="cccccccc" />
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
-       x="37.428871"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+       x="27.903862"
        y="232.96793"
        id="text1109"><tspan
          sodipodi:role="line"
-         x="37.428871"
+         x="27.903862"
          y="232.96793"
-         style="stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
-         id="tspan1107">Recursive Feature Elimination (RFE)</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan1107">(b) Recursive Feature Elimination (RFE)</tspan></text>
     <text
        xml:space="preserve"
        id="text1115"
@@ -356,14 +400,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
        x="136.07384"
        y="251.63333"
        id="text1049"><tspan
          sodipodi:role="line"
          x="136.07384"
          y="251.63333"
-         style="stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
          id="tspan1047">v.s.</tspan></text>
     <text
        xml:space="preserve"
@@ -388,57 +432,57 @@
          id="tspan667">subsets</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
        x="101.01988"
        y="269.9227"
        id="text1062"><tspan
          sodipodi:role="line"
          x="101.01988"
          y="269.9227"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1060">Linear</tspan><tspan
          sodipodi:role="line"
          x="101.01988"
          y="275.28491"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1066">regression</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
        x="139.18605"
        y="269.98886"
        id="text1072"><tspan
          sodipodi:role="line"
          x="139.18605"
          y="269.98886"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1070">Score predicted</tspan><tspan
          sodipodi:role="line"
          x="139.18605"
          y="275.35107"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1076">concentrations</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
        x="96.390579"
        y="290.95798"
        id="text1082"><tspan
          sodipodi:role="line"
          x="96.390579"
          y="290.95798"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1080">recursively prune feature set</tspan><tspan
          sodipodi:role="line"
          x="96.390579"
          y="296.32019"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1181">to maximize score (R<tspan
-   style="font-size:65%;text-align:center;baseline-shift:super;text-anchor:middle;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;baseline-shift:super;text-anchor:middle"
    id="tspan1084">2</tspan>)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
        x="-247.88597"
        y="156.68515"
        id="text1090"
@@ -448,7 +492,7 @@
          sodipodi:role="line"
          x="-247.88597"
          y="156.68515"
-         style="text-align:center;text-anchor:middle;stroke-width:0.264583;-inkscape-font-specification:'Times New Roman, ';font-family:'Times New Roman';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1088">true</tspan></text>
     <g
        id="g1071">
@@ -775,5 +819,103 @@
        height="7.9375"
        x="42.333332"
        y="300.30206" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+       x="27.768095"
+       y="178.57317"
+       id="text539"><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="178.57317"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan537">(a) Pipeline utilizing feature selection</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="183.93538"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan643" /><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="189.29761"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan647">    1. Gather reference library</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="194.65982"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan674">    2. Construct linear combinations of references</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="200.02203"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan684">    3. Apply PCA to linear combinations</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="205.38426"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan676">    4. Perform feature selection using PCA projections</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="210.74648"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan682">    5. Add energies to ensure normalization of subspectra</tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="216.10869"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan686">    6. Collect experimental subspectra </tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="221.47092"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan688">    7. Perform linear combination fitting onto subspectra </tspan><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="226.83313"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan670" /><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="232.19534"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan672" /><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="237.55757"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan653" /><tspan
+         sodipodi:role="line"
+         x="27.768095"
+         y="242.91978"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         id="tspan655" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:0.95;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
+       x="94.350281"
+       y="330.23428"
+       id="text659"><tspan
+         sodipodi:role="line"
+         x="94.350281"
+         y="330.23428"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan657">End when number of energies left equals desired </tspan><tspan
+         sodipodi:role="line"
+         x="94.350281"
+         y="335.5965"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan662">number of features</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.88056px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:0.960784;stroke:#000000;stroke-width:1"
+       x="27.182917"
+       y="207.52428"
+       id="text666"><tspan
+         sodipodi:role="line"
+         id="tspan664"
+         style="stroke-width:1"
+         x="27.182917"
+         y="207.52428"></tspan></text>
   </g>
 </svg>
